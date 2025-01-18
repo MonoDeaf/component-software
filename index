@@ -1,0 +1,5084 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+/* styles.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #090909;
+  color: #f1f1f1;
+  height: 100vh;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Toolbar styles */
+.toolbar {
+  background: #111111;
+  padding: 8px 16px;
+  border-bottom: 1px solid #1e1e1e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tool-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.tool {
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  color: #f1f1f1;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.tool.active {
+  background: #1e1e1e;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.export-btn {
+  background: #9d8cff;
+  color: #111111;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Workspace styles */
+.workspace {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Sidebar styles */
+.sidebar-left, .sidebar-right {
+  background: #111111;
+  width: 240px;
+  border-right: 1px solid #1e1e1e;
+  overflow-y: auto;
+}
+
+.sidebar-right {
+  border-right: none;
+  border-left: 1px solid #1e1e1e;
+}
+
+.panel {
+  height: 100%;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #1e1e1e;
+  font-weight: 500;
+}
+
+.panel-content {
+  padding: 16px;
+}
+
+/* Layer list styles */
+.layer-list {
+  list-style: none;
+}
+
+.layer-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  transition: outline 0.2s ease;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
+.layer-list li.active {
+  background: #1e1e1e;
+  outline: 2px solid #9d8cff;
+}
+
+/* Property styles */
+.property {
+  margin-bottom: 16px;
+}
+
+.property label {
+  display: block;
+  margin-bottom: 8px;
+  color: #888;
+}
+
+.input-group {
+  display: flex;
+  gap: 8px;
+}
+
+input[type="number"] {
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  color: #f1f1f1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+input[type="range"] {
+  width: 100%;
+  background: #1e1e1e;
+  height: 4px;
+  border-radius: 2px;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #f1f1f1;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Canvas area styles */
+.canvas-area {
+  flex: 1;
+  background: #090909;
+  overflow: auto;
+  cursor: grab;
+  position: relative;
+}
+
+.canvas-area:active {
+  cursor: grabbing;
+}
+
+/* Canvas styles */
+.canvas {
+  position: absolute;
+  min-width: 2000px;
+  min-height: 2000px;
+  user-select: none;
+}
+
+/* Modal styles */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 100px;
+  z-index: 1000;
+}
+
+.modal-backdrop.active {
+  display: flex;
+}
+
+.modal {
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  width: 240px;
+}
+
+.modal-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #1e1e1e;
+  font-weight: 500;
+}
+
+.modal-content {
+  padding: 8px;
+}
+
+.layer-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.layer-option:hover {
+  background: #1e1e1e;
+}
+
+.add-layer-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: #f1f1f1;
+}
+
+.add-layer-btn:hover {
+  background: #1e1e1e;
+}
+
+/* Image placeholder and selection styles */
+.image-placeholder {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: #1e1e1e;
+  border: 2px dashed #333;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform-origin: center;
+  transition: outline 0.2s ease;
+}
+
+.image-placeholder.has-image {
+  border: none;
+  background: none;
+  width: auto;
+  height: auto;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #888;
+}
+
+.uploaded-image {
+  display: block;
+  max-width: none;
+  max-height: none;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 4px;
+  pointer-events: none;
+  user-select: none;
+  position: absolute;
+  transform-origin: center;
+}
+
+.image-placeholder.selected {
+  outline: 2px solid #9d8cff;
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+.image-placeholder.has-image.selected {
+  outline: 2px solid #9d8cff;
+}
+
+/* Selection handles */
+.selection-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #9d8cff;
+  border: 2px solid #f1f1f1;
+  border-radius: 50%;
+  pointer-events: all;
+  z-index: 1000;
+}
+
+.selection-handle.top-left { 
+  top: -6px; 
+  left: -6px; 
+  cursor: nw-resize;
+}
+.selection-handle.top-right { 
+  top: -6px; 
+  right: -6px; 
+  cursor: ne-resize;
+}
+.selection-handle.bottom-left { 
+  bottom: -6px; 
+  left: -6px; 
+  cursor: sw-resize;
+}
+.selection-handle.bottom-right { 
+  bottom: -6px; 
+  right: -6px; 
+  cursor: se-resize;
+}
+
+/* Delete button styles */
+.delete-btn {
+  position: absolute;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background: none;
+  border: none;
+  color: #f1f1f1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.delete-btn:hover {
+  color: #ff4444;
+}
+
+.layer-list li:hover .delete-btn {
+  opacity: 1;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* canvas.css */
+.canvas-area {
+  margin: 0;
+  padding: 0;
+  cursor: grab;
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-area:active {
+  cursor: grabbing;
+}
+
+.canvas-area::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.canvas-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.canvas-area::-webkit-scrollbar-thumb {
+  background: #181818;
+  border-radius: 4px;
+}
+
+.canvas-area::-webkit-scrollbar-thumb:hover {
+  background: #222222;
+}
+
+.canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  user-select: none;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.image-placeholder {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: rgba(30, 30, 30, 0.5);
+  border: 2px dashed #333;
+  border-radius: 8px;
+  cursor: pointer;
+  transform-origin: center;
+  z-index: 1;
+}
+
+.image-placeholder.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.image-placeholder.empty::after {
+  content: 'No image selected';
+  font-size: 14px;
+}
+
+.image-content-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+}
+
+.image-placeholder.has-image {
+  border: none;
+  background: none;
+  width: auto;
+  height: auto;
+}
+
+.uploaded-image {
+  display: block;
+  max-width: none;
+  max-height: none;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 4px;
+  pointer-events: none;
+  user-select: none;
+  transform-origin: center;
+}
+
+.image-placeholder .fx-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ff4a00;
+  color: #111111;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.image-placeholder:hover .fx-btn,
+.image-placeholder.selected .fx-btn {
+  opacity: 1;
+  display: flex !important;
+}
+
+.image-placeholder.selected {
+  outline: 2px solid #ff4a00;
+  outline-offset: 2px;
+  z-index: 3;
+}
+
+.image-placeholder.has-image.selected {
+  outline: 2px solid #ff4a00;
+  z-index: 3;
+}
+
+.upload-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #888;
+  z-index: 2;
+}
+
+.selection-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #181818;
+  border: 1px solid #f1f1f1;
+  border-radius: 50%;
+  pointer-events: all;
+  z-index: 4;
+}
+
+.selection-handle.top-left { 
+  top: -6px; 
+  left: -6px; 
+  cursor: nw-resize;
+}
+
+.selection-handle.top-right { 
+  top: -6px; 
+  right: -6px; 
+  cursor: ne-resize;
+}
+
+.selection-handle.bottom-left { 
+  bottom: -6px; 
+  left: -6px; 
+  cursor: sw-resize;
+}
+
+.selection-handle.bottom-right { 
+  bottom: -6px; 
+  right: -6px; 
+  cursor: se-resize;
+}
+
+.text-element {
+  position: absolute;
+  min-width: 100px;
+  min-height: 40px;
+  cursor: move;
+  transition: outline 0.2s ease;
+  z-index: 2;
+}
+
+.text-element .text-content {
+  font-size: 32px;
+  color: #f1f1f1;
+  outline: none;
+  padding: 4px;
+  cursor: text;
+  white-space: nowrap;
+}
+
+.text-element.selected {
+  outline: 2px solid #ff4a00;
+  outline-offset: 2px;
+  z-index: 3;
+}
+
+.text-element .fx-btn {
+  position: absolute;
+  top: -32px;
+  right: 0;
+  background: #ff4a00;
+  color: #111111;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.text-element:hover .fx-btn,
+.text-element.selected .fx-btn {
+  display: flex;
+}
+
+.text-element .fx-btn:hover {
+  background: #ff7f17;
+}
+
+.mouse-layer {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.mouse-layer.selected {
+  outline: 2px solid #ff4a00;
+  outline-offset: 2px;
+  z-index: 3;
+}
+
+.mouse-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mouse-effect-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.fx-panel-canvas {
+  position: absolute;
+  background: #111111;
+  border: 1px solid #ff4a00;
+  border-radius: 4px;
+  width: 240px;
+  padding: 48px 16px 16px 16px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.fx-panel-canvas.active {
+  opacity: 1;
+}
+
+.fx-panel-canvas .panel-title {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-weight: 500;
+}
+
+.fx-panel-canvas .fx-close {
+  position: absolute;
+  top: 12px;
+  right: 8px;
+  color: #f1f1f1;
+  font-size: 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 8px;
+}
+
+.fx-panel-canvas .fx-close:hover {
+  color: red;
+}
+
+.fx-panel-canvas .fx-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.fx-panel-canvas .fx-button {
+  background: #1e1e1e;
+  border: 1px solid transparent;
+  color: #f1f1f1;
+  padding: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.fx-panel-canvas .fx-button:hover {
+  border-color: #ff4a00;
+}
+
+.fx-panel-canvas .fx-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.shape-container {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: transparent;
+  border-radius: 8px;
+  cursor: move;
+  z-index: 2;
+}
+
+.shape-container.selected {
+  outline: 2px solid #ff4a00;
+  outline-offset: 2px;
+  z-index: 3;
+}
+
+.shape-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+/* components.css */
+/* Navigation Component */
+.nav-component {
+  position: absolute;
+  min-width: 600px;
+  background: #111111;
+  border-radius: 8px;
+  padding: 16px 24px;
+  z-index: 2;
+}
+
+.nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-logo {
+  font-weight: 500;
+  font-size: 24px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+
+.nav-links a {
+  color: #f1f1f1;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: #9d8cff;
+}
+
+.nav-menu {
+  display: none;
+  color: #f1f1f1;
+  padding: 8px;
+}
+
+.nav-menu svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Card Component */
+.card-component {
+  position: absolute;
+  width: 300px;
+  background: #111111;
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.card-image {
+  height: 160px;
+  background: #1e1e1e;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M4 4h16v16H4z' fill='none' stroke='%23333' stroke-width='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='2' fill='%23333'/%3E%3Cpath d='M4 20l6-6 4 4 2-2 4 4' stroke='%23333' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 48px;
+}
+
+.card-body {
+  padding: 24px;
+}
+
+.card-body h3 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.card-body p {
+  color: #888;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.card-button {
+  background: #f1f1f1;
+  color: #111111;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.card-button:hover {
+  background: #8a7ae6;
+}
+
+/* Button Component */
+.button-component {
+  position: absolute;
+  z-index: 2;
+}
+
+.button-content {
+  background: #f1f1f1;
+  color: #111111;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.button-content:hover {
+  background: #8a7ae6;
+  transform: translateY(-1px);
+}
+
+.button-content svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Selection and Dragging States */
+.component-container.selected {
+  outline: 1px solid #ff4a00;
+  outline-offset: 2px;
+  z-index: 3;
+}
+
+.component-container.dragging {
+  opacity: 0.8;
+  cursor: grabbing;
+}
+
+/* Make content editable areas more visible on hover */
+[contenteditable]:hover {
+  outline: 1px dashed #ff4a00;
+  outline-offset: 2px;
+}
+
+[contenteditable]:focus {
+  outline: 2px solid #ff4a00;
+  outline-offset: 2px;
+}
+
+/* export.css */
+.export-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 48px 0;
+}
+
+.export-modal-backdrop.active {
+  display: flex;
+}
+
+.export-modal {
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  border-radius: 8px;
+  width: 900px;
+  max-height: calc(100vh - 96px);
+  display: flex;
+  overflow: hidden;
+}
+
+.export-controls {
+  width: 50%;
+  padding: 24px;
+  border-right: 1px solid #1e1e1e;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #181818 transparent;
+}
+
+.export-controls::-webkit-scrollbar {
+  width: 8px;
+}
+
+.export-controls::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.export-controls::-webkit-scrollbar-thumb {
+  background: #181818;
+  border-radius: 4px;
+}
+
+.export-preview {
+  width: 50%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.preview-container {
+  flex: none;
+  background: #090909;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  padding: 16px;
+  height: 200px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #1e1e1e;
+}
+
+.preview-container canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  object-fit: contain;
+}
+
+.code-preview {
+  flex: 1;
+  background: #090909;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  padding: 16px;
+  font-family: monospace;
+  color: #888;
+  position: relative;
+  display: flex;
+  overflow: hidden;
+}
+
+.code-scroll {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #181818 transparent;
+  padding-right: 16px;
+}
+
+.code-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.code-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.code-scroll::-webkit-scrollbar-thumb {
+  background: #181818;
+  border-radius: 4px;
+}
+
+.preview-placeholder {
+  color: #666;
+  text-align: center;
+  padding: 32px;
+}
+
+.export-header {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.export-control {
+  margin-bottom: 24px;
+}
+
+.export-control label {
+  display: block;
+  margin-bottom: 8px;
+  color: #888;
+}
+
+.export-control select {
+  width: 100%;
+  background: #1e1e1e;
+  border: none;
+  color: #f1f1f1;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.export-control .range-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.export-control input[type="text"] {
+  width: 100%;
+  background: #1e1e1e;
+  border: none;
+  color: #f1f1f1;
+  padding: 8px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.code-tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+
+.code-tab {
+  padding: 8px 16px;
+  background: #1e1e1e;
+  color: #888;
+  border: none;
+  cursor: pointer;
+}
+
+.code-tab.active {
+  background: #090909;
+  color: #f1f1f1;
+}
+
+.export-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: auto;
+}
+
+.export-btn-primary {
+  background: #ff4a00;
+  color: #111111;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.export-btn-primary:hover {
+  background: #ff7f17;
+}
+
+.cancel-btn {
+  background: none;
+  border: 1px solid #1e1e1e;
+  color: #f1f1f1;
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.export-option {
+  background: #1e1e1e;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.export-option:hover {
+  border-color: #ff4a00;
+}
+
+.export-option.active {
+  border-color: #ff4a00;
+  background: #2e2e2e;
+}
+
+.export-option-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.export-option-header svg {
+  width: 24px;
+  height: 24px;
+}
+
+.export-option-title {
+  font-weight: 500;
+}
+
+.export-option-desc {
+  color: #888;
+  font-size: 14px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #1e1e1e;
+  border: none;
+  color: #888;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.code-preview:hover .copy-btn {
+  opacity: 1;
+}
+
+.copy-btn:hover {
+  background: #2e2e2e;
+  color: #f1f1f1;
+}
+
+/* layers.css */
+/* Rename to elements.css */
+.sidebar-left {
+  background: #111111;
+  width: 240px;
+  border-right: 1px solid #1e1e1e;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #181818 transparent;
+  max-height: 300px;
+}
+
+.sidebar-left::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-left::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-left::-webkit-scrollbar-thumb {
+  background: #181818;
+  border-radius: 4px;
+}
+
+.sidebar-left::-webkit-scrollbar-thumb:hover {
+  background: #222222;
+}
+
+.panel {
+  height: 100%;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #1e1e1e;
+  font-weight: 500;
+}
+
+.panel-content {
+  padding: 8px;
+}
+
+
+.fx-btn {
+  position: absolute;
+  right: 36px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background: #9d8cff;
+  color: #111111;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.fx-btn:hover {
+  background: #8a7ae6;
+}
+
+/* New element grid styles */
+.elements-grid {
+  display: grid;
+  width: 100%;
+  padding-right: 5px;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 8px;
+}
+
+.element-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #141414;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #c4c4c4;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  gap: 8px;
+  height: 120px;
+}
+
+.element-btn:hover {
+  background: #2e2e2e;
+  border-color: #ff4a00;
+}
+
+.element-btn.active {
+  background: #2e2e2e;
+  border-color: #ff4a00;
+}
+
+.element-btn svg {
+  width: 24px;
+  height: 24px;
+  color: #444444;
+}
+
+.element-btn span {
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* main.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #090909;
+  color: #f1f1f1;
+  height: 100vh;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.workspace {
+  position: fixed;
+  top: 56px; /* Toolbar height */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.canvas-area {
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar-left, .sidebar-right {
+  position: fixed;
+  top: 56px; /* Match toolbar height exactly */
+  height: calc(100vh - 72px); /* Adjusted to maintain spacing at bottom */
+  width: 280px;
+  background: #111111;
+  border-radius: 8px;
+  margin: 8px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-left {
+  left: 0;
+}
+
+.sidebar-right {
+  right: 0;
+}
+
+.toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 101;
+  background: #111111;
+}
+
+.panel {
+  height: 100%;
+  border: 1px solid #1e1e1e;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.panel-content {
+  height: calc(100% - 49px); /* Full height - header height */
+  overflow-y: auto;
+}
+
+.panel-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.panel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel-content::-webkit-scrollbar-thumb {
+  background: #181818;
+  border-radius: 4px;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.chat-box {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  width: 300px;
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  border-radius: 8px;
+  padding: 16px;
+  color: #f1f1f1;
+  font-size: 14px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-box-text {
+  color: #888;
+  line-height: 1.4;
+}
+
+.chat-box-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #888;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.chat-box-close:hover {
+  color: #f1f1f1;
+}
+
+.mobile-warning {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 10000;
+  color: #f1f1f1;
+  font-size: 18px;
+  text-align: center;
+  padding: 48px 24px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-warning svg {
+  width: 48px;
+  height: 48px;
+  color: #9d8cff;
+}
+
+@media (max-width: 800px) {
+  .mobile-warning {
+    display: flex;
+  }
+}
+
+/* modal.css */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-backdrop.active {
+  display: flex;
+}
+
+.modal {
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  border-radius: 8px;
+  width: 900px;
+  display: flex;
+  overflow: hidden;
+  margin: 0;
+  max-height: 80vh;
+}
+
+.modal-left {
+  width: 50%;
+  padding: 24px;
+  border-right: 1px solid #1e1e1e;
+}
+
+.modal-right {
+  width: 50%;
+  padding: 24px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.modal-header {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.layer-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.layer-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background: #1e1e1e;
+  transition: all 0.2s ease;
+}
+
+.layer-option:hover {
+  border-color: #9d8cff;
+  background: #2e2e2e;
+}
+
+.layer-option svg {
+  width: 32px;
+  height: 32px;
+}
+
+.layer-option span {
+  font-size: 14px;
+}
+
+.layer-category {
+  margin-bottom: 24px;
+}
+
+.layer-category-title {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.preset-card {
+  background: #1e1e1e;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preset-card:hover {
+  border-color: #9d8cff;
+  background: #2e2e2e;
+}
+
+.preset-preview {
+  width: 100%;
+  height: 160px;
+  background: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preset-info {
+  padding: 12px;
+}
+
+.preset-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.preset-desc {
+  font-size: 12px;
+  color: #888;
+}
+
+.modal-scroll {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #181818 transparent;
+}
+
+.modal-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: #181818;
+  border-radius: 4px;
+}
+
+/* properties.css */
+.sidebar-right {
+  background: #111111;
+  width: 240px;
+  border-left: 1px solid #1e1e1e;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.property {
+  margin-bottom: 16px;
+}
+
+.property label {
+  display: block;
+  margin-bottom: 8px;
+  color: #888;
+  font-size: 14px;
+}
+
+.input-group {
+  display: flex;
+  gap: 8px;
+}
+
+input[type="number"] {
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  color: #f1f1f1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+input[type="range"] {
+  width: 100%;
+  background: #1e1e1e;
+  height: 4px;
+  border-radius: 2px;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #f1f1f1;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.properties-panel, .fx-panel {
+  height: 100%;
+}
+
+.fx-panel {
+  display: none;
+  padding: 16px;
+  position: relative;
+}
+
+.fx-panel.active {
+  display: block;
+}
+
+.fx-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.fx-button {
+  background: #1e1e1e;
+  border: 2px solid transparent;
+  color: #f1f1f1;
+  padding: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.fx-button:hover {
+  border-color: #ff4a00;
+}
+
+.fx-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.fx-close {
+  position: absolute;
+  top: 0;
+  right: 16px;
+  color: #f1f1f1;
+  font-size: 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 8px;
+}
+
+.fx-close:hover {
+  color: #9d8cff;
+}
+
+.fx-popup {
+  position: fixed;
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  width: 240px;
+  max-height: 320;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: none;
+  scrollbar-width: thin;
+  scrollbar-color: #181818 transparent;
+  pointer-events: auto;
+  transform: translateY(-50%);
+}
+
+.fx-popup.active {
+  display: block;
+}
+
+.fx-popup::-webkit-scrollbar {
+  width: 8px;
+}
+
+.fx-popup::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fx-popup::-webkit-scrollbar-thumb {
+  background: #181818;
+  border-radius: 4px;
+}
+
+.fx-popup .fx-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.fx-popup .fx-button {
+  background: #1e1e1e;
+  border: 2px solid transparent;
+  color: #f1f1f1;
+  padding: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.fx-popup .fx-button:hover {
+  border-color: #ff4a00;
+}
+
+.fx-popup .fx-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #f1f1f1;
+  font-size: 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 8px;
+}
+
+.fx-popup .fx-close:hover {
+  color: #9d8cff;
+}
+
+.fx-btn {
+  background: #ff4a00;
+  color: #111111;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.fx-btn:hover {
+  background: #ff7f17;
+}
+
+.image-placeholder .fx-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ff4a00;
+  color: #111111;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.image-placeholder:hover .fx-btn,
+.image-placeholder.selected .fx-btn {
+  display: flex;
+  opacity: 1;
+}
+
+.image-placeholder .fx-btn:hover {
+  background: #ff7f17;
+}
+
+.text-properties {
+  margin-top: 16px;
+}
+
+.text-properties input[type="text"],
+.text-properties input[type="color"],
+.text-properties select {
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  color: #f1f1f1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.text-properties select {
+  height: 32px;
+}
+
+.text-properties input[type="color"] {
+  height: 32px;
+  padding: 2px 4px;
+}
+
+.font-weight-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.weight-option {
+  background: #1e1e1e;
+  border: 2px solid transparent;
+  color: #f1f1f1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 12px;
+}
+
+.weight-option:hover {
+  background: #2e2e2e;
+}
+
+.weight-option.active {
+  border-color: #9d8cff;
+  background: #2e2e2e;
+}
+
+.stroke-options {
+  margin-top: 8px;
+  padding: 8px;
+  background: #1e1e1e;
+  border-radius: 4px;
+  display: none;
+}
+
+.stroke-options.active {
+  display: block;
+}
+
+.stroke-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.stroke-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #333;
+  border-radius: 2px;
+  background: #111111;
+  appearance: none;
+  cursor: pointer;
+}
+
+.stroke-checkbox input[type="checkbox"]:checked {
+  background: #9d8cff;
+  position: relative;
+}
+
+.stroke-checkbox input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #111111;
+  font-size: 12px;
+}
+
+.stroke-settings {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.font-preview {
+  font-size: 24px;
+  padding: 8px;
+  background: #1e1e1e;
+  border-radius: 4px;
+  margin: 8px 0;
+  text-align: center;
+  min-height: 48px;
+}
+
+.mouse-effects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.effect-btn {
+  background: #1e1e1e;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #f1f1f1;
+}
+
+.effect-btn:hover {
+  border-color: #9d8cff;
+  background: #2e2e2e;
+}
+
+.effect-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.effect-btn span {
+  font-size: 12px;
+}
+
+.effect-btn.active {
+  border-color: #9d8cff;
+  background: #2e2e2e;
+}
+
+.image-upload {
+  margin-bottom: 16px;
+}
+
+.image-upload label {
+  display: block;
+  margin-bottom: 8px;
+  color: #888;
+}
+
+.image-upload-btn {
+  width: 100%;
+  background: #1e1e1e;
+  border: 2px dashed #333;
+  border-radius: 4px;
+  padding: 16px;
+  color: #666;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.image-upload-btn:hover {
+  background: #2e2e2e;
+  border-color: #ff4a00;
+  color: #f1f1f1;
+}
+
+.image-preview {
+  margin-top: 16px;
+  background: #1e1e1e;
+  border-radius: 4px;
+  padding: 8px;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.image-preview img {
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
+
+.image-preview .empty-state {
+  color: #666;
+  text-align: center;
+  padding: 32px 16px;
+}
+
+.fx-panel-canvas {
+  position: fixed;
+  bottom: 24px;
+  right: 8px;
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  border-radius: 8px;
+  width: 240px;
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 48px 16px 16px 16px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  transform: translateY(20px);
+  will-change: transform, opacity;
+}
+
+.fx-panel-canvas.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fx-panel-canvas .panel-title {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-weight: 500;
+}
+
+.fx-panel-canvas .fx-close {
+  position: absolute;
+  top: 12px;
+  right: 8px;
+  color: #f1f1f1;
+  font-size: 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 8px;
+}
+
+.fx-panel-canvas .fx-close:hover {
+  color: #ff4a00;
+}
+
+/* toolbar.css */
+.toolbar {
+  background: #111111;
+  padding: 8px 16px;
+  border-bottom: 1px solid #1e1e1e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #c4c4c4;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tool-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.tool {
+  background: #111111;
+  border: 1px solid #1e1e1e;
+  color: #c4c4c4;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.tool.active {
+  background: #1e1e1e;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.export-btn {
+  background: #ff4a00;
+  color: #111111;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.export-btn:hover {
+  background: #ff7f17;
+}
+
+</style>
+</head>
+<body>
+
+<!-- From index.html -->
+
+  <div class="app">
+    <!-- Toolbar -->
+    <header class="toolbar">
+      <div class="toolbar-left">
+        <button class="menu-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16">
+            <path d="M2 4h12M2 8h12M2 12h12" stroke="#f1f1f1" stroke-width="2" fill="none"/>
+          </svg>
+        </button>
+        <span>Untitled project</span>
+        <div class="tool-icons">
+          <button class="tool active">
+            <svg width="16" height="16" viewBox="0 0 16 16">
+              <rect x="2" y="2" width="12" height="12" fill="#9d8cff"/>
+            </svg>
+          </button>
+          <button class="tool">
+            <svg width="16" height="16" viewBox="0 0 16 16">
+              <path d="M4 4l8 8M4 12l8-8" stroke="#f1f1f1" stroke-width="2"/>
+            </svg>
+          </button>
+          <button class="tool">T</button>
+          <button class="tool">
+            <svg width="16" height="16" viewBox="0 0 16 16">
+              <circle cx="8" cy="8" r="6" fill="none" stroke="#f1f1f1" stroke-width="2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <span>v1.0.0</span>
+        <button class="export-btn">Export</button>
+      </div>
+    </header>
+
+    <!-- Main workspace -->
+    <main class="workspace">
+      <!-- Left sidebar -->
+      <aside class="sidebar-left">
+        <div class="panel">
+          <div class="panel-header">
+            <span>Elements</span>
+          </div>
+          <div class="panel-content">
+            <div class="elements-grid">
+              <button class="element-btn" data-type="image">
+                <svg viewBox="0 0 24 24">
+                  <rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="8.5" cy="8.5" r="2" fill="currentColor"/>
+                  <path d="M4 20l6-6 4 4 2-2 4 4" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Image</span>
+              </button>
+              <button class="element-btn" data-type="text">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 7h16M12 7v10M8 17h8" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Text</span>
+              </button>
+              <button class="element-btn" data-type="shape">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2L2 8l10 6 10-6-10-6z" stroke="currentColor" fill="none" stroke-width="2"/>
+                  <path d="M2 16l10 6 10-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                </svg>
+                <span>3D Shape</span>
+              </button>
+              <button class="element-btn" data-type="nav">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Navigation</span>
+              </button>
+              <button class="element-btn" data-type="button">
+                <svg viewBox="0 0 24 24">
+                  <rect x="4" y="8" width="16" height="8" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Button</span>
+              </button>
+              <button class="element-btn" data-type="card">
+                <svg viewBox="0 0 24 24">
+                  <rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Card</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Canvas area -->
+      <div class="canvas-area">
+        <div class="canvas"></div>
+      </div>
+
+      <!-- Right sidebar -->
+      <aside class="sidebar-right">
+        <div class="panel">
+          <div class="panel-header">
+            <span>Properties</span>
+          </div>
+          <div class="properties-panel">
+            <div class="panel-content">
+              <div class="property">
+                <label>Position</label>
+                <div class="input-group">
+                  <input type="number" data-prop="pos-x" value="0">
+                  <input type="number" data-prop="pos-y" value="0">
+                </div>
+              </div>
+              <div class="property">
+                <label>Size</label>
+                <div class="input-group">
+                  <input type="number" data-prop="width" value="200">
+                  <input type="number" data-prop="height" value="200">
+                </div>
+              </div>
+              <div class="text-properties" style="display: none;">
+                <div class="property">
+                  <label>Text Content</label>
+                  <input type="text" data-prop="text-content" value="Text">
+                </div>
+                
+                <div class="property">
+                  <label>Font Family</label>
+                  <select data-prop="font-family">
+                    <option value="Montserrat, sans-serif">Montserrat</option>
+                    <option value="Manrope, sans-serif">Manrope</option>
+                    <option value="Geist, sans-serif">Geist</option>
+                    <option value="Roboto, sans-serif">Roboto</option>
+                    <option value="Open Sans, sans-serif">Open Sans</option>
+                    <option value="Lato, sans-serif">Lato</option>
+                    <option value="Poppins, sans-serif">Poppins</option>
+                  </select>
+                </div>
+
+                <div class="property">
+                  <label>Font Size</label>
+                  <input type="number" data-prop="font-size" value="32">
+                </div>
+
+                <div class="property">
+                  <label>Font Weight</label>
+                  <div class="font-weight-options">
+                    <button class="weight-option" data-weight="300">Light</button>
+                    <button class="weight-option active" data-weight="400">Regular</button>
+                    <button class="weight-option" data-weight="500">Medium</button>
+                    <button class="weight-option" data-weight="700">Bold</button>
+                  </div>
+                </div>
+
+                <div class="property">
+                  <label>Font Color</label>
+                  <input type="color" data-prop="font-color" value="#f1f1f1">
+                </div>
+
+                <div class="property">
+                  <label>Text Stroke</label>
+                  <div class="stroke-checkbox">
+                    <input type="checkbox" data-prop="stroke-enabled" id="stroke-enabled">
+                    <label for="stroke-enabled">Enable stroke</label>
+                  </div>
+                  <div class="stroke-options">
+                    <div class="stroke-settings">
+                      <input type="color" data-prop="stroke-color" value="#000000">
+                      <input type="number" data-prop="stroke-width" value="1" min="0" max="20" step="0.5">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="font-preview">
+                  Preview Text
+                </div>
+              </div>
+            </div>
+            <div class="fx-panel">
+              <button class="fx-close">×</button>
+              <div class="fx-grid">
+                <button class="fx-button">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>Brighten</span>
+                </button>
+                <button class="fx-button">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/>
+                  </svg>
+                  <span>Contrast</span>
+                </button>
+                <button class="fx-button">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>Sharpen</span>
+                </button>
+                <button class="fx-button">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="6" y="6" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"/>
+                  </svg>
+                  <span>Blur</span>
+                </button>
+                <button class="fx-button">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 12s4-8 8-8 8 8 8 8-4 8-8 8-8-8-8-8z" stroke="currentColor" stroke-width="2" fill="none"/>
+                  </svg>
+                  <span>Saturation</span>
+                </button>
+                <button class="fx-button">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 3L3 21h18L12 3z" stroke="currentColor" stroke-width="2" fill="none"/>
+                  </svg>
+                  <span>Exposure</span>
+                </button>
+                <button class="fx-button">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M3 12c6-6 12 6 18 0" stroke="currentColor" stroke-width="2" fill="none"/>
+                  </svg>
+                  <span>Curves</span>
+                </button>
+                <button class="fx-button">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M8 8h8v8H8z" stroke="currentColor" stroke-width="2" fill="none"/>
+                  </svg>
+                  <span>Vignette</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Layer creation modal -->
+    <div class="modal-backdrop">
+      <div class="modal">
+        <div class="modal-left">
+          <h2 class="modal-header">Add Layer</h2>
+          <div class="modal-scroll">
+            <div class="layer-category">
+              <div class="layer-category-title">Basic Elements</div>
+              <div class="layer-options">
+                <div class="layer-option" data-type="image">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="8.5" cy="8.5" r="2" fill="currentColor"/>
+                    <path d="M4 20l6-6 4 4 2-2 4 4" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>Image</span>
+                </div>
+                <div class="layer-option" data-type="text">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 7h16M12 7v10M8 17h8" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>Text</span>
+                </div>
+                <div class="layer-option" data-type="shape">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 8l10 6 10-6-10-6z" stroke="currentColor" fill="none" stroke-width="2"/>
+                    <path d="M2 16l10 6 10-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                    <path d="M2 12l10 6 10-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+                  </svg>
+                  <span>3D Shape</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="layer-category">
+              <div class="layer-category-title">Components</div>
+              <div class="layer-options">
+                <div class="layer-option" data-type="faq">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 14v-1c0-1 .5-1.5 2-2.5s2-2 2-3c0-2-1.5-3-4-3s-4 1-4 3" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="17" r="1" fill="currentColor"/>
+                  </svg>
+                  <span>FAQ</span>
+                </div>
+                <div class="layer-option" data-type="nav">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>Navigation Menu</span>
+                </div>
+                <div class="layer-option" data-type="sticker">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 12l10 10 10-10L12 2z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>Sticker</span>
+                </div>
+                <div class="layer-option" data-type="button">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="4" y="8" width="16" height="8" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>Button</span>
+                </div>
+                <div class="layer-option" data-type="card">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>Card</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="layer-category">
+              <div class="layer-category-title">Interactive</div>
+              <div class="layer-options">
+                <div class="layer-option" data-type="slider">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 12h16" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="16" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>Slider</span>
+                </div>
+                <div class="layer-option" data-type="tabs">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M4 4h6v4H4zM10 4h6v4h-6z" fill="currentColor"/>
+                  </svg>
+                  <span>Tabs</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-right">
+          <h2 class="modal-header">Presets</h2>
+          <div class="modal-scroll">
+            <div class="preset-grid">
+              <div class="preset-card">
+                <div class="preset-preview">
+                  <svg width="100" height="100" viewBox="0 0 100 100">
+                    <rect x="20" y="20" width="60" height="60" fill="none" stroke="#666" stroke-width="2"/>
+                    <circle cx="35" cy="35" r="8" fill="#666"/>
+                    <path d="M20 80l20-20 15 15 10-10 15 15" stroke="#666" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="preset-info">
+                  <div class="preset-title">Image Gallery</div>
+                  <div class="preset-desc">Responsive image grid with hover effects</div>
+                </div>
+              </div>
+              <div class="preset-card">
+                <div class="preset-preview">
+                  <svg width="100" height="100" viewBox="0 0 100 100">
+                    <rect x="20" y="30" width="60" height="40" rx="20" fill="none" stroke="#666" stroke-width="2"/>
+                    <circle cx="40" cy="50" r="5" fill="#666"/>
+                    <circle cx="60" cy="50" r="5" fill="#666"/>
+                  </svg>
+                </div>
+                <div class="preset-info">
+                  <div class="preset-title">Hero Section</div>
+                  <div class="preset-desc">Full-width banner with animated text</div>
+                </div>
+              </div>
+              <div class="preset-card">
+                <div class="preset-preview">
+                  <svg width="100" height="100" viewBox="0 0 100 100">
+                    <path d="M30 35h40M30 50h40M30 65h40" stroke="#666" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="preset-info">
+                  <div class="preset-title">FAQ Accordion</div>
+                  <div class="preset-desc">Expandable Q&A sections</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="export-modal-backdrop">
+    <div class="export-modal">
+      <div class="export-controls">
+        <h2 class="export-header">Export Animation</h2>
+        
+        <div class="export-control">
+          <label>Export Type</label>
+          <div class="export-options">
+            <div class="export-option active" data-type="embed">
+              <div class="export-option-header">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="export-option-title">Embed Code</span>
+              </div>
+              <p class="export-option-desc">Get code to embed this animation in an existing website</p>
+            </div>
+            
+            <div class="export-option" data-type="standalone">
+              <div class="export-option-header">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <path d="M8 8h8v8H8z" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+                <span class="export-option-title">Standalone Page</span>
+              </div>
+              <p class="export-option-desc">Get complete HTML file with animation</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="export-control">
+          <label>Configuration</label>
+          <div class="range-wrapper">
+            <input type="text" name="canvas-id" value="animation" placeholder="Canvas ID">
+          </div>
+        </div>
+        
+        <div class="export-control">
+          <label>Animation Settings</label>
+          <div class="checkbox-wrapper">
+            <input type="checkbox" name="autoplay" checked>
+            <label>Autoplay animation</label>
+          </div>
+          <div class="checkbox-wrapper">
+            <input type="checkbox" name="loop" checked>
+            <label>Loop animation</label>
+          </div>
+          <div class="checkbox-wrapper">
+            <input type="checkbox" name="controls">
+            <label>Show controls</label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="export-preview">
+        <div class="code-tabs">
+          <button class="code-tab active" data-lang="html">HTML</button>
+          <button class="code-tab" data-lang="css">CSS</button>
+        </div>
+        
+        <div class="preview-container">
+          <!-- Canvas preview will be rendered here -->
+        </div>
+        
+        <div class="code-preview">
+          <div class="code-scroll">
+            <pre><code>Select export options to see preview</code></pre>
+          </div>
+        </div>
+        
+        <div class="export-actions">
+          <button class="cancel-btn">Cancel</button>
+          <button class="export-btn-primary">Copy Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chat-box">
+    <button class="chat-box-close">×</button>
+    <div class="chat-box-text">
+      Having trouble? Click here to take a tour of the editor.
+    </div>
+  </div>
+  <div class="mobile-warning">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 2L2 22h20L12 2z" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M12 10v6" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="18" r="1" fill="currentColor"/>
+    </svg>
+    <div>Device screen size is too small.</div>
+    <div>Please come back on a larger screen!</div>
+  </div>
+
+
+<script>
+
+// app.js
+import { initializeToolbar } from './toolbar.js';
+import { initializeElements } from './layers.js';
+import { initializeCanvas } from './canvas.js';
+import { initializeProperties } from './properties.js';
+import { initializeExport } from './export.js';
+import { ExportManager } from './export-manager.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize export manager globally
+  window.exportManager = new ExportManager();
+  
+  // Create layer manager first
+  window.layerManager = {
+    createLayer(type, properties) {
+      const layerId = window.exportManager.addLayer(type, properties);
+      return layerId;
+    },
+
+    updateLayerProperties(layerId, properties) {
+      window.exportManager.updateLayerProperties(layerId, properties);
+    },
+
+    updateLayerContent(layerId, content) {
+      window.exportManager.updateLayerContent(layerId, content);
+    }
+  };
+
+  // Initialize all modules
+  const { clearCurrentElement } = initializeElements();
+  initializeToolbar();
+  initializeCanvas();
+  initializeProperties();
+  initializeExport();
+  
+  // Watch for layer list changes
+  const observer = new MutationObserver((mutations) => {
+    // Handle z-index updates directly here
+    const layerElements = document.querySelectorAll('.layer-list li');
+    layerElements.forEach((layer, index) => {
+      const layerId = layer.dataset.layerId;
+      if (layerId) {
+        const element = document.querySelector(`[data-layer-id="${layerId}"]`);
+        if (element) {
+          element.style.zIndex = layerElements.length - index;
+        }
+      }
+    });
+  });
+
+  const layerList = document.querySelector('.layer-list');
+  if (layerList) {
+    observer.observe(layerList, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  // Make element management functions available globally
+  window.elementManager = {
+    clearCurrentElement
+  };
+});
+
+// toolbar.js
+export function initializeToolbar() {
+  const tools = document.querySelectorAll('.tool');
+  
+  tools.forEach(tool => {
+    tool.addEventListener('click', () => {
+      tools.forEach(t => t.classList.remove('active'));
+      tool.classList.add('active');
+    });
+  });
+}
+
+// shape-handler.js
+/* global mat4 */
+
+function checkDependencies() {
+  if (typeof mat4 === 'undefined') {
+    console.error('Required gl-matrix library not loaded');
+    return false;
+  }
+  return true;
+}
+
+export function initialize3DShape(layerId) {
+  // Check dependencies first
+  if (!checkDependencies()) {
+    return null;
+  }
+
+  // Add null checks
+  if (!layerId) {
+    console.error('No layer ID provided');
+    return null;
+  }
+
+  const canvas = document.querySelector('.canvas');
+  if (!canvas) {
+    console.error('Canvas element not found');
+    return null;
+  }
+
+  try {
+    // Create container
+    const shapeContainer = document.createElement('div');
+    shapeContainer.className = 'shape-container';
+    shapeContainer.dataset.layerId = layerId;
+    
+    // Add WebGL canvas
+    const glCanvas = document.createElement('canvas');
+    glCanvas.className = 'shape-canvas';
+    shapeContainer.appendChild(glCanvas);
+
+    // Initialize WebGL context with error handling
+    const gl = glCanvas.getContext('webgl', {
+      alpha: true,
+      premultipliedAlpha: false,
+      antialias: true
+    });
+
+    if (!gl) {
+      throw new Error('WebGL not supported');
+    }
+
+    // Set initial canvas size
+    glCanvas.width = 200;
+    glCanvas.height = 200;
+    gl.viewport(0, 0, glCanvas.width, glCanvas.height);
+
+    // Vertex shader program
+    const vsSource = `
+      attribute vec4 aVertexPosition;
+      attribute vec4 aVertexColor;
+      uniform mat4 uModelViewMatrix;
+      uniform mat4 uProjectionMatrix;
+      varying lowp vec4 vColor;
+      void main(void) {
+        gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+        vColor = aVertexColor;
+      }
+    `;
+
+    // Fragment shader program
+    const fsSource = `
+      varying lowp vec4 vColor;
+      void main(void) {
+        gl_FragColor = vColor;
+      }
+    `;
+
+    // Initialize shaders
+    function initShaderProgram(gl, vsSource, fsSource) {
+      const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+      const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+      const shaderProgram = gl.createProgram();
+      gl.attachShader(shaderProgram, vertexShader);
+      gl.attachShader(shaderProgram, fragmentShader);
+      gl.linkProgram(shaderProgram);
+
+      if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+        console.error('Unable to initialize shader program: ' + gl.getProgramInfoLog(shaderProgram));
+        return null;
+      }
+
+      return shaderProgram;
+    }
+
+    function loadShader(gl, type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+
+      return shader;
+    }
+
+    const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+    if (!shaderProgram) {
+      throw new Error('Failed to initialize shader program');
+    }
+
+    const programInfo = {
+      program: shaderProgram,
+      attribLocations: {
+        vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+        vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
+      },
+      uniformLocations: {
+        projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+        modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+      },
+    };
+
+    // Create cube vertices and colors
+    const positions = [
+      // Front face
+      -1.0, -1.0,  1.0,
+       1.0, -1.0,  1.0,
+       1.0,  1.0,  1.0,
+      -1.0,  1.0,  1.0,
+      
+      // Back face
+      -1.0, -1.0, -1.0,
+      -1.0,  1.0, -1.0,
+       1.0,  1.0, -1.0,
+       1.0, -1.0, -1.0,
+      
+      // Top face
+      -1.0,  1.0, -1.0,
+      -1.0,  1.0,  1.0,
+       1.0,  1.0,  1.0,
+       1.0,  1.0, -1.0,
+      
+      // Bottom face
+      -1.0, -1.0, -1.0,
+       1.0, -1.0, -1.0,
+       1.0, -1.0,  1.0,
+      -1.0, -1.0,  1.0,
+      
+      // Right face
+       1.0, -1.0, -1.0,
+       1.0,  1.0, -1.0,
+       1.0,  1.0,  1.0,
+       1.0, -1.0,  1.0,
+      
+      // Left face
+      -1.0, -1.0, -1.0,
+      -1.0, -1.0,  1.0,
+      -1.0,  1.0,  1.0,
+      -1.0,  1.0, -1.0,
+    ];
+
+    const colors = [
+      // Front face
+      1.0, 0.5, 0.8, 1.0,
+      1.0, 0.5, 0.8, 1.0,
+      1.0, 0.5, 0.8, 1.0,
+      1.0, 0.5, 0.8, 1.0,
+      
+      // Back face
+      0.8, 0.5, 1.0, 1.0,
+      0.8, 0.5, 1.0, 1.0,
+      0.8, 0.5, 1.0, 1.0,
+      0.8, 0.5, 1.0, 1.0,
+      
+      // Top face
+      0.5, 0.8, 1.0, 1.0,
+      0.5, 0.8, 1.0, 1.0,
+      0.5, 0.8, 1.0, 1.0,
+      0.5, 0.8, 1.0, 1.0,
+      
+      // Bottom face
+      1.0, 0.8, 0.5, 1.0,
+      1.0, 0.8, 0.5, 1.0,
+      1.0, 0.8, 0.5, 1.0,
+      1.0, 0.8, 0.5, 1.0,
+      
+      // Right face
+      0.8, 1.0, 0.5, 1.0,
+      0.8, 1.0, 0.5, 1.0,
+      0.8, 1.0, 0.5, 1.0,
+      0.8, 1.0, 0.5, 1.0,
+      
+      // Left face
+      0.5, 1.0, 0.8, 1.0,
+      0.5, 1.0, 0.8, 1.0,
+      0.5, 1.0, 0.8, 1.0,
+      0.5, 1.0, 0.8, 1.0,
+    ];
+
+    const indices = [
+      0,  1,  2,    0,  2,  3,   // Front
+      4,  5,  6,    4,  6,  7,   // Back
+      8,  9,  10,   8,  10, 11,  // Top
+      12, 13, 14,   12, 14, 15,  // Bottom
+      16, 17, 18,   16, 18, 19,  // Right
+      20, 21, 22,   20, 22, 23,  // Left
+    ];
+
+    // Create and bind buffers
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+    const colorBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+
+    const indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+    let rotation = 0;
+    let isAnimating = true;
+
+    // Initialize dragging functionality
+    let isDragging = false;
+    let startX, startY;
+    let elementX, elementY;
+
+    function handleMouseDown(e) {
+      if (e.target.closest('.selection-handle')) {
+        return;
+      }
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      isDragging = true;
+      
+      // Store initial mouse position
+      startX = e.clientX;
+      startY = e.clientY;
+      
+      // Store initial element position
+      elementX = parseInt(shapeContainer.style.left) || 0;
+      elementY = parseInt(shapeContainer.style.top) || 0;
+      
+      // Select shape
+      selectShape(shapeContainer);
+      shapeContainer.classList.add('dragging');
+    }
+
+    function handleMouseMove(e) {
+      if (!isDragging) return;
+      
+      e.preventDefault();
+      
+      // Calculate distance moved
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+      
+      // Update element position
+      shapeContainer.style.left = `${elementX + deltaX}px`;
+      shapeContainer.style.top = `${elementY + deltaY}px`;
+    }
+
+    function handleMouseUp() {
+      if (!isDragging) return;
+      
+      isDragging = false;
+      shapeContainer.classList.remove('dragging');
+    }
+
+    function selectShape(element) {
+      // Deselect all other elements
+      document.querySelectorAll('.shape-container, .image-placeholder, .text-element').forEach(el => {
+        el.classList.remove('selected');
+        el.querySelectorAll('.selection-handle').forEach(handle => {
+          handle.style.display = 'none';
+        });
+      });
+      
+      // Select current element
+      element.classList.add('selected');
+      element.querySelectorAll('.selection-handle').forEach(handle => {
+        handle.style.display = 'block';
+      });
+      
+      // Update properties panel
+      import('./properties.js').then(module => {
+        module.initializeProperties().updateProperties(element);
+      });
+    }
+
+    shapeContainer.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    // Position in center of viewport
+    const centerX = (window.innerWidth - 200) / 2;
+    const centerY = (window.innerHeight - 200) / 2;
+    
+    shapeContainer.style.left = `${centerX}px`;
+    shapeContainer.style.top = `${centerY}px`;
+    
+    // Add selection handles
+    const handles = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+    handles.forEach(position => {
+      const handle = document.createElement('div');
+      handle.className = `selection-handle ${position}`;
+      handle.style.display = 'none';
+      shapeContainer.appendChild(handle);
+    });
+
+    canvas.appendChild(shapeContainer);
+
+    // Update error handling
+    function render() {
+      if (!gl || !isAnimating) return;
+      
+      try {
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clearDepth(1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        const fieldOfView = 45 * Math.PI / 180;
+        const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+        const zNear = 0.1;
+        const zFar = 100.0;
+        const projectionMatrix = mat4.create();
+
+        mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+
+        const modelViewMatrix = mat4.create();
+        mat4.translate(modelViewMatrix, modelViewMatrix, [0.0, 0.0, -6.0]);
+        mat4.rotate(modelViewMatrix, modelViewMatrix, rotation, [0.5, 1, 0.5]);
+        
+        rotation += 0.01;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        gl.vertexAttribPointer(programInfo.attribLocations.vertexColor, 4, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(programInfo.attribLocations.vertexColor);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+        gl.useProgram(programInfo.program);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
+
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+        requestAnimationFrame(render);
+      } catch (error) {
+        console.error('Render error:', error);
+        isAnimating = false;
+      }
+    }
+
+    // Start rendering with error handling
+    try {
+      render();
+    } catch (error) {
+      console.error('Failed to start render loop:', error);
+      isAnimating = false;
+    }
+
+    return {
+      shapeContainer,
+      cleanup: () => {
+        try {
+          isAnimating = false;
+          if (gl) {
+            gl.getExtension('WEBGL_lose_context')?.loseContext();
+          }
+        } catch (error) {
+          console.error('Cleanup error:', error);
+        }
+      }
+    };
+
+  } catch (error) {
+    console.error('3D shape initialization failed:', error);
+    return null;
+  }
+}
+
+// export.js
+export function initializeExport() {
+  const exportBtn = document.querySelector('.export-btn');
+  const exportModal = document.querySelector('.export-modal-backdrop');
+  const previewContainer = document.querySelector('.preview-container');
+  const codePreview = document.querySelector('.code-preview');
+
+  exportBtn.addEventListener('click', () => {
+    exportModal.classList.add('active');
+    generatePreview();
+  });
+
+  // Listen for layer updates and regenerate preview
+  window.addEventListener('layersupdate', () => {
+    if (exportModal.classList.contains('active')) {
+      generatePreview();
+    }
+  });
+
+  const cancelBtn = exportModal.querySelector('.cancel-btn');
+  cancelBtn.addEventListener('click', () => {
+    exportModal.classList.remove('active');
+  });
+
+  exportModal.addEventListener('click', (e) => {
+    if (e.target === exportModal) {
+      exportModal.classList.remove('active');
+    }
+  });
+
+  // Export options handlers
+  const exportOptions = document.querySelectorAll('.export-option');
+  const codeTabs = document.querySelectorAll('.code-tab');
+
+  exportOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      exportOptions.forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+      generatePreview();
+    });
+  });
+
+  codeTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      codeTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      generatePreview();
+    });
+  });
+
+  function generatePreview() {
+    const activeOption = document.querySelector('.export-option.active');
+    const activeTab = document.querySelector('.code-tab.active');
+    const isStandalone = activeOption?.dataset.type === 'standalone';
+
+    let code = '';
+    let preview = '';
+
+    try {
+      if (isStandalone) {
+        const generated = window.exportManager.generateStandaloneCode();
+        code = generated.html;
+        preview = generated.preview;
+      } else {
+        const embed = window.exportManager.generateEmbed();
+        code = activeTab?.dataset.lang === 'html' ? embed.html : embed.css;
+        preview = embed.combined;
+      }
+
+      // Update code preview
+      const codeScroll = document.createElement('div');
+      codeScroll.className = 'code-scroll';
+      codeScroll.innerHTML = `<pre><code>${escapeHtml(code)}</code></pre>`;
+
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-btn';
+      copyBtn.textContent = 'Copy';
+
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(code);
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy';
+        }, 2000);
+      });
+
+      codePreview.innerHTML = '';
+      codePreview.appendChild(codeScroll);
+      codePreview.appendChild(copyBtn);
+
+      // Update preview container
+      previewContainer.innerHTML = preview;
+
+    } catch (error) {
+      console.error('Error generating preview:', error);
+      codePreview.innerHTML = '<div class="code-scroll"><pre><code>Error generating code preview</code></pre></div>';
+      previewContainer.innerHTML = '<div class="preview-placeholder">Error generating preview</div>';
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+}
+
+// image-handler.js
+import { EffectsManager } from './effects/effects-manager.js';
+
+const effectsManager = new EffectsManager();
+
+export function initializeImageHandler(layerId) {
+  const canvas = document.querySelector('.canvas');
+  
+  // Create empty placeholder 
+  const placeholder = document.createElement('div');
+  placeholder.className = 'image-placeholder empty';
+  placeholder.dataset.layerId = layerId;
+  
+  // Position in center of viewport
+  const rect = canvas.getBoundingClientRect();
+  const centerX = (window.innerWidth - 200) / 2;
+  const centerY = (window.innerHeight - 200) / 2;
+  
+  placeholder.style.left = `${centerX}px`;
+  placeholder.style.top = `${centerY}px`;
+  
+  // Add handles for resizing
+  const handles = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+  handles.forEach(position => {
+    const handle = document.createElement('div');
+    handle.className = `selection-handle ${position}`;
+    handle.style.display = 'none';
+    placeholder.appendChild(handle);
+  });
+  
+  canvas.appendChild(placeholder);
+  
+  // Add file input
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.style.display = 'none';
+  document.body.appendChild(fileInput);
+  
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.className = 'uploaded-image';
+        
+        img.onload = () => {
+          const maxInitialWidth = 400;
+          const maxInitialHeight = 400;
+          
+          const aspectRatio = img.naturalWidth / img.naturalHeight;
+          let newWidth = img.naturalWidth;
+          let newHeight = img.naturalHeight;
+          
+          if (newWidth > maxInitialWidth || newHeight > maxInitialHeight) {
+            if (aspectRatio > 1) {
+              newWidth = maxInitialWidth;
+              newHeight = newWidth / aspectRatio;
+            } else {
+              newHeight = maxInitialHeight;
+              newWidth = newHeight * aspectRatio;
+            }
+          }
+          
+          // Create content wrapper
+          const contentWrapper = document.createElement('div');
+          contentWrapper.className = 'image-content-wrapper';
+          
+          // Add image to wrapper
+          img.style.width = `${newWidth}px`;
+          img.style.height = `${newHeight}px`;
+          contentWrapper.appendChild(img);
+          
+          // Clear placeholder and add wrapper
+          placeholder.innerHTML = '';
+          placeholder.appendChild(contentWrapper);
+          
+          // Add FX button
+          const fxBtn = document.createElement('button');
+          fxBtn.className = 'fx-btn';
+          fxBtn.innerHTML = '✦';
+          fxBtn.title = 'Add FX';
+          placeholder.appendChild(fxBtn);
+          
+          placeholder.classList.remove('empty');
+          placeholder.classList.add('has-image');
+          
+          // Re-add selection handles
+          const handles = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+          handles.forEach(position => {
+            const handle = document.createElement('div');
+            handle.className = `selection-handle ${position}`;
+            handle.style.display = placeholder.classList.contains('selected') ? 'block' : 'none';
+            placeholder.appendChild(handle);
+          });
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+  
+  function initializeImageInteractions() {
+    let isDragging = false;
+    let startX, startY;
+    let elementX, elementY;
+    
+    function selectImage(element) {
+      // Deselect all other elements
+      document.querySelectorAll('.image-placeholder, .text-element').forEach(el => {
+        el.classList.remove('selected');
+        el.querySelectorAll('.selection-handle').forEach(handle => {
+          handle.style.display = 'none';
+        });
+      });
+      
+      // Select current element
+      element.classList.add('selected');
+      element.querySelectorAll('.selection-handle').forEach(handle => {
+        handle.style.display = 'block';
+      });
+      
+      // Select corresponding layer
+      document.querySelectorAll('.layer-list li').forEach(layer => {
+        layer.classList.remove('active');
+      });
+      const correspondingLayer = document.querySelector(`.layer-list li[data-layer-id="${element.dataset.layerId}"]`);
+      if (correspondingLayer) {
+        correspondingLayer.classList.add('active');
+      }
+      
+      // Update properties panel
+      import('./properties.js').then(module => {
+        module.initializeProperties().updateProperties(element);
+      });
+    }
+    
+    function handleMouseDown(e) {
+      if (e.target.closest('.selection-handle') || e.target.closest('.fx-btn')) {
+        return;
+      }
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      isDragging = true;
+      selectImage(placeholder);
+      
+      // Store initial mouse position
+      startX = e.clientX;
+      startY = e.clientY;
+      
+      // Store initial element position
+      elementX = parseInt(placeholder.style.left) || 0;
+      elementY = parseInt(placeholder.style.top) || 0;
+      
+      // Add dragging class
+      placeholder.classList.add('dragging');
+    }
+    
+    function handleMouseMove(e) {
+      if (!isDragging) return;
+      
+      e.preventDefault();
+      
+      // Calculate distance moved
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+      
+      // Update element position based on initial position plus movement
+      placeholder.style.left = `${elementX + deltaX}px`;
+      placeholder.style.top = `${elementY + deltaY}px`;
+      
+      // Update properties panel
+      import('./properties.js').then(module => {
+        module.initializeProperties().updateProperties(placeholder);
+      });
+    }
+    
+    function handleMouseUp() {
+      if (!isDragging) return;
+      
+      isDragging = false;
+      placeholder.classList.remove('dragging');
+    }
+    
+    placeholder.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    // Initialize resizing functionality
+    function initializeResizing(element) {
+      const handles = element.querySelectorAll('.selection-handle');
+      
+      handles.forEach(handle => {
+        handle.addEventListener('mousedown', startResizing);
+      });
+
+      function startResizing(e) {
+        e.stopPropagation();
+        
+        const handle = e.target;
+        const image = element.querySelector('img');
+        if (!image) return;
+        
+        const rect = image.getBoundingClientRect();
+        const startX = e.clientX;
+        const startY = e.clientY;
+        
+        const initialWidth = image.offsetWidth;
+        const initialHeight = image.offsetHeight;
+        const initialLeft = element.offsetLeft;
+        const initialTop = element.offsetTop;
+        
+        const aspectRatio = initialWidth / initialHeight;
+        const isLeftHandle = handle.className.includes('left');
+        const isTopHandle = handle.className.includes('top');
+        
+        function resize(e) {
+          let newWidth = initialWidth;
+          let newHeight = initialHeight;
+          let newLeft = initialLeft;
+          let newTop = initialTop;
+
+          if (isLeftHandle) {
+            const deltaX = (startX - e.clientX);
+            newWidth = initialWidth + deltaX;
+            newLeft = initialLeft - deltaX;
+          } else {
+            const deltaX = (e.clientX - startX);
+            newWidth = initialWidth + deltaX;
+          }
+
+          newHeight = newWidth / aspectRatio;
+
+          if (isTopHandle) {
+            const deltaY = (startY - e.clientY);
+            newHeight = initialHeight + deltaY;
+            newTop = initialTop - deltaY;
+            newWidth = newHeight * aspectRatio;
+            if (isLeftHandle) {
+              newLeft = initialLeft - (newWidth - initialWidth);
+            }
+          }
+
+          if (newWidth >= 50 && newHeight >= 50) {
+            image.style.width = `${newWidth}px`;
+            image.style.height = `${newHeight}px`;
+            element.style.left = `${newLeft}px`;
+            element.style.top = `${newTop}px`;
+            
+            // Update properties panel
+            import('./properties.js').then(module => {
+              module.initializeProperties().updateProperties(element);
+            });
+          }
+        }
+        
+        function stopResizing() {
+          window.removeEventListener('mousemove', resize);
+          window.removeEventListener('mouseup', stopResizing);
+        }
+        
+        window.addEventListener('mousemove', resize);
+        window.addEventListener('mouseup', stopResizing);
+      }
+    }
+
+    // Initialize resizing for placeholder
+    initializeResizing(placeholder);
+  }
+  
+  // Add FX button click handler
+  placeholder.addEventListener('click', (e) => {
+    const fxBtn = e.target.closest('.fx-btn');
+    if (fxBtn) {
+      e.stopPropagation();
+      
+      // Remove any existing FX panels
+      document.querySelectorAll('.fx-panel-canvas').forEach(panel => panel.remove());
+      
+      // Create new FX panel
+      const fxPanel = document.createElement('div');
+      fxPanel.className = 'fx-panel-canvas';
+      fxPanel.innerHTML = `
+        <span class="panel-title">FX & Animations</span>
+        <button class="fx-close">×</button>
+        <div class="fx-grid">
+          <button class="fx-button" data-effect="rotate">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 4v2M12 18v2M4 12H2M22 12h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M12 12h0M17 12a5 5 0 01-5 5M12 17a5 5 0 01-5-5M7 12a5 5 0 015-5M12 7a5 5 0 015 5" 
+                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>Rotate</span>
+          </button>
+          <button class="fx-button">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+              <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Fade In</span>
+          </button>
+          <button class="fx-button">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2" fill="none"/>
+              <path d="M20 12H4" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Slide In</span>
+          </button>
+          <button class="fx-button">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+              <path d="M12 8v8" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Scale In</span>
+          </button>
+          <button class="fx-button">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 12c8-8 8 8 16 0" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+            <span>Bounce</span>
+          </button>
+          <button class="fx-button">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+              <path d="M12 12h6" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Spin</span>
+          </button>
+          <button class="fx-button">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 4l16 16M4 20L20 4" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Blur</span>
+          </button>
+          <button class="fx-button">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 12s4-8 8-8s8 8 8 8-4 8-8 8-8-8-8-8z" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+            <span>Glow</span>
+          </button>
+          <button class="fx-button">
+            <svg viewBox="0 0 24 24">
+              <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"/>
+              <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Custom</span>
+          </button>
+        </div>
+      `;
+
+      // Add click handlers for effect buttons
+      fxPanel.querySelectorAll('.fx-button').forEach(button => {
+        const effectName = button.dataset.effect;
+        if (effectName) {
+          button.addEventListener('click', () => {
+            // Remove active class from all buttons
+            fxPanel.querySelectorAll('.fx-button').forEach(btn => 
+              btn.classList.remove('active')
+            );
+            
+            // If clicking an already active effect, remove it
+            if (effectsManager.getActiveEffect(layerId) === effectName) {
+              effectsManager.removeEffect(layerId);
+              button.classList.remove('active');
+            } else {
+              // Apply the new effect
+              effectsManager.applyEffect(layerId, effectName);
+              button.classList.add('active');
+            }
+          });
+          
+          // Set initial active state if effect is already applied
+          if (effectsManager.getActiveEffect(layerId) === effectName) {
+            button.classList.add('active');
+          }
+        }
+      });
+
+      // Add panel to body instead of canvas
+      document.body.appendChild(fxPanel);
+
+      // Add close button handler
+      const closeBtn = fxPanel.querySelector('.fx-close');
+      closeBtn.addEventListener('click', () => {
+        fxPanel.classList.remove('active');
+        setTimeout(() => {
+          fxPanel.remove();
+        }, 200);
+      });
+
+      // Show panel with animation after a short delay
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          fxPanel.classList.add('active');
+        });
+      });
+    }
+  });
+
+  return {
+    placeholder,
+    initializeImageInteractions
+  };
+}
+
+export function initializeTextHandler(layerId) {
+  const canvas = document.querySelector('.canvas');
+  
+  // Create text element
+  const textElement = document.createElement('div');
+  textElement.className = 'text-element';
+  textElement.dataset.layerId = layerId;
+  
+  // Position in center of viewport
+  const rect = canvas.getBoundingClientRect();
+  const centerX = (window.innerWidth - 100) / 2;
+  const centerY = (window.innerHeight - 40) / 2;
+  
+  textElement.style.left = `${centerX}px`;
+  textElement.style.top = `${centerY}px`;
+  
+  // Add text content
+  const textContent = document.createElement('div');
+  textContent.className = 'text-content';
+  textContent.contentEditable = true;
+  textContent.textContent = 'Text';
+  textElement.appendChild(textContent);
+  
+  // Add handles for resizing
+  const handles = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+  handles.forEach(position => {
+    const handle = document.createElement('div');
+    handle.className = `selection-handle ${position}`;
+    handle.style.display = 'none';
+    textElement.appendChild(handle);
+  });
+  
+  canvas.appendChild(textElement);
+  
+  // Initialize dragging functionality
+  let isDragging = false;
+  
+  textElement.addEventListener('mousedown', (e) => {
+    if (e.target === textElement || e.target.classList.contains('selection-handle')) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Deselect all other elements
+      document.querySelectorAll('.image-placeholder, .text-element').forEach(el => {
+        el.classList.remove('selected');
+        el.querySelectorAll('.selection-handle').forEach(handle => {
+          handle.style.display = 'none';
+        });
+      });
+      
+      // Select current element
+      textElement.classList.add('selected');
+      textElement.querySelectorAll('.selection-handle').forEach(handle => {
+        handle.style.display = 'block';
+      });
+      
+      // Select corresponding layer
+      document.querySelectorAll('.layer-list li').forEach(layer => {
+        layer.classList.remove('active');
+      });
+      const correspondingLayer = document.querySelector(`.layer-list li[data-layer-id="${layerId}"]`);
+      if (correspondingLayer) {
+        correspondingLayer.classList.add('active');
+      }
+      
+      isDragging = true;
+      textElement.classList.add('dragging');
+      
+      // Calculate offset from click position to element edge
+      const rect = textElement.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
+      
+      // Store offsets
+      textElement.dataset.offsetX = offsetX;
+      textElement.dataset.offsetY = offsetY;
+    }
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+      e.preventDefault();
+      
+      // Get stored offsets
+      const offsetX = parseFloat(textElement.dataset.offsetX);
+      const offsetY = parseFloat(textElement.dataset.offsetY);
+      
+      // Calculate new position
+      const newX = e.clientX - offsetX;
+      const newY = e.clientY - offsetY;
+      
+      // Get canvas bounds
+      const canvas = document.querySelector('.canvas');
+      const canvasRect = canvas.getBoundingClientRect();
+      
+      // Set position relative to canvas
+      textElement.style.left = `${newX - canvasRect.left}px`;
+      textElement.style.top = `${newY - canvasRect.top}px`;
+      
+      // Update properties panel
+      import('./properties.js').then(module => {
+        module.initializeProperties().updateProperties(textElement);
+      });
+    }
+  });
+  
+  document.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      textElement.classList.remove('dragging');
+      
+      // Clean up offsets
+      delete textElement.dataset.offsetX;
+      delete textElement.dataset.offsetY; 
+    }
+  });
+  
+  return {
+    textElement,
+    initializeTextInteractions: () => {} // Empty function since we handle interactions in the constructor
+  };
+}
+
+// layers.js
+export function initializeElements() {
+  const elementButtons = document.querySelectorAll('.element-btn');
+  const canvas = document.querySelector('.canvas');
+
+  // Clear current element 
+  function clearCurrentElement() {
+    const elements = canvas.querySelectorAll('.image-placeholder, .text-element, .shape-container, .component-container');
+    elements.forEach(el => el.remove());
+    
+    // Clear active state from all buttons
+    elementButtons.forEach(btn => btn.classList.remove('active'));
+  }
+
+  elementButtons.forEach(button => {
+    button.addEventListener('click', async () => {
+      clearCurrentElement();
+      
+      // Add active state to clicked button
+      button.classList.add('active');
+      
+      const elementType = button.dataset.type;
+      const layerId = `element-${Date.now()}`;
+
+      // Create layer first
+      window.layerManager.createLayer(elementType);
+
+      // Initialize the appropriate handler based on element type
+      try {
+        switch(elementType) {
+          case 'image':
+            const imageModule = await import('./image-handler.js');
+            const { placeholder, initializeImageInteractions } = imageModule.initializeImageHandler(layerId);
+            if (placeholder && initializeImageInteractions) {
+              initializeImageInteractions();
+            }
+            break;
+          
+          case 'text':
+            const textModule = await import('./image-handler.js');
+            const { textElement, initializeTextInteractions } = textModule.initializeTextHandler(layerId);
+            if (textElement && initializeTextInteractions) {
+              initializeTextInteractions();
+            }
+            break;
+          
+          case 'shape':
+            const shapeModule = await import('./shape-handler.js');
+            const shape = await shapeModule.initialize3DShape(layerId);
+            break;
+          
+          case 'nav':
+          case 'card':
+          case 'button':
+            const componentModule = await import('./component-handler.js');
+            const { componentContainer } = await componentModule.initializeComponentHandler(layerId, elementType);
+            break;
+        }
+      } catch (error) {
+        console.error('Error initializing element:', error);
+      }
+    });
+  });
+
+  // Handle canvas click to deselect elements
+  canvas.addEventListener('click', (e) => {
+    if (e.target === canvas) {
+      document.querySelectorAll('.image-placeholder, .text-element, .shape-container, .component-container').forEach(el => {
+        el.classList.remove('selected');
+        el.querySelectorAll('.selection-handle').forEach(handle => {
+          handle.style.display = 'none';
+        });
+      });
+    }
+  });
+
+  return {
+    clearCurrentElement
+  };
+}
+
+// mouse-handler.js
+export function initializeMouseEffects(element) {
+  // Add null checks and error handling
+  if (!element) {
+    console.error('Mouse layer element is null');
+    return;
+  }
+  
+  // Ensure canvas exists
+  let canvas = element.querySelector('.mouse-effect-canvas');
+  if (!canvas) {
+    console.error('Canvas element not found - creating new canvas');
+    canvas = document.createElement('canvas');
+    canvas.className = 'mouse-effect-canvas';
+    element.appendChild(canvas);
+  }
+
+  // Get WebGL context with error handling 
+  const gl = canvas.getContext('webgl');
+  if (!gl) {
+    console.error('WebGL not supported');
+    return;
+  }
+
+  // Update canvas size initially
+  function updateCanvasSize() {
+    if (canvas && element) {
+      canvas.width = element.clientWidth || 200;
+      canvas.height = element.clientHeight || 200;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+  }
+  updateCanvasSize();
+
+  // Basic vertex shader
+  const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertexShader, `
+    attribute vec2 position;
+    void main() {
+      gl_Position = vec4(position, 0.0, 1.0);
+    }
+  `);
+  gl.compileShader(vertexShader);
+
+  // Basic fragment shader
+  const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragmentShader, `
+    precision mediump float;
+    uniform vec2 mouse;
+    uniform vec2 resolution;
+    uniform float time;
+    
+    void main() {
+      vec2 uv = gl_FragCoord.xy / resolution;
+      vec2 m = mouse / resolution;
+      float d = distance(uv, m);
+      float glow = 0.03 / d;
+      vec3 color = vec3(0.6, 0.4, 1.0) * glow;
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `);
+  gl.compileShader(fragmentShader);
+
+  // Create program
+  const program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+  gl.useProgram(program);
+
+  // Set up buffers
+  const vertices = new Float32Array([
+    -1, -1,
+    1, -1,
+    -1, 1,
+    1, 1
+  ]);
+  
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+  // Set up attributes and uniforms
+  const position = gl.getAttribLocation(program, 'position');
+  gl.enableVertexAttribArray(position);
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
+  const mouseUniform = gl.getUniformLocation(program, 'mouse');
+  const resolutionUniform = gl.getUniformLocation(program, 'resolution');
+  const timeUniform = gl.getUniformLocation(program, 'time');
+
+  // Animation loop
+  let mouseX = 0, mouseY = 0;
+  let time = 0;
+  let isAnimating = true;
+
+  // Update properties panel with error handling
+  function updateProperties() {
+    const propertiesPanel = document.querySelector('.properties-panel .panel-content');
+    if (!propertiesPanel) {
+      console.error('Properties panel not found');
+      return;
+    }
+
+    // Update panel content with error handling
+    try {
+      propertiesPanel.innerHTML = `
+        <div class="property">
+          <label>Mouse Effects</label>
+          <div class="mouse-effects-grid">
+            <button class="effect-btn active" data-effect="glow">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="6" fill="none" stroke="#f1f1f1" stroke-width="2"/>
+                <circle cx="12" cy="12" r="2" fill="#f1f1f1"/>
+              </svg>
+              <span>Glow</span>
+            </button>
+            <button class="effect-btn" data-effect="particles">
+              <svg viewBox="0 0 24 24">
+                <circle cx="8" cy="8" r="2" fill="#f1f1f1"/>
+                <circle cx="16" cy="12" r="2" fill="#f1f1f1"/>
+                <circle cx="12" cy="16" r="2" fill="#f1f1f1"/>
+              </svg>
+              <span>Particles</span>
+            </button>
+            <button class="effect-btn" data-effect="ripple">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="4" fill="none" stroke="#f1f1f1" stroke-width="2"/>
+                <circle cx="12" cy="12" r="8" fill="none" stroke="#f1f1f1" stroke-width="1" opacity="0.5"/>
+              </svg>
+              <span>Ripple</span>
+            </button>
+            <button class="effect-btn" data-effect="trail">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 12h16" stroke="#f1f1f1" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="2" fill="#f1f1f1"/>
+              </svg>
+              <span>Trail</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Add effect button handlers with error checking
+      const effectButtons = propertiesPanel.querySelectorAll('.effect-btn');
+      if (effectButtons) {
+        effectButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            effectButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const effect = btn.dataset.effect;
+            if (effect) {
+              updateShader(effect);
+            }
+          });
+        });
+      }
+    } catch (error) {
+      console.error('Error updating properties panel:', error);
+    }
+  }
+
+  // Update shader based on selected effect
+  function updateShader(effect) {
+    // Update fragment shader based on selected effect
+    let fragmentSource = '';
+    
+    switch(effect) {
+      case 'glow':
+        fragmentSource = `
+          precision mediump float;
+          uniform vec2 mouse;
+          uniform vec2 resolution;
+          uniform float time;
+          
+          void main() {
+            vec2 uv = gl_FragCoord.xy / resolution;
+            vec2 m = mouse / resolution;
+            float d = distance(uv, m);
+            float glow = 0.03 / d;
+            vec3 color = vec3(0.6, 0.4, 1.0) * glow;
+            gl_FragColor = vec4(color, 1.0);
+          }
+        `;
+        break;
+      
+      case 'particles':
+        fragmentSource = `
+          precision mediump float;
+          uniform vec2 mouse;
+          uniform vec2 resolution;
+          uniform float time;
+          
+          float random(vec2 st) {
+            return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+          }
+          
+          void main() {
+            vec2 uv = gl_FragCoord.xy / resolution;
+            vec2 m = mouse / resolution;
+            float d = distance(uv, m);
+            
+            float r = random(uv + time);
+            float particles = step(0.98, r) * (1.0 - d * 2.0);
+            
+            vec3 color = vec3(0.6, 0.4, 1.0) * particles;
+            gl_FragColor = vec4(color, particles);
+          }
+        `;
+        break;
+      
+      case 'ripple':
+        fragmentSource = `
+          precision mediump float;
+          uniform vec2 mouse;
+          uniform vec2 resolution;
+          uniform float time;
+          
+          void main() {
+            vec2 uv = gl_FragCoord.xy / resolution;
+            vec2 m = mouse / resolution;
+            float d = distance(uv, m);
+            
+            float wave = sin(d * 20.0 - time * 5.0) * 0.5 + 0.5;
+            float ripple = smoothstep(0.2, 0.0, d) * wave;
+            
+            vec3 color = vec3(0.6, 0.4, 1.0) * ripple;
+            gl_FragColor = vec4(color, ripple);
+          }
+        `;
+        break;
+        
+      case 'trail':
+        fragmentSource = `
+          precision mediump float;
+          uniform vec2 mouse;
+          uniform vec2 resolution;
+          uniform float time;
+          
+          void main() {
+            vec2 uv = gl_FragCoord.xy / resolution;
+            vec2 m = mouse / resolution;
+            float d = distance(uv, m);
+            
+            float trail = smoothstep(0.1, 0.0, d) * sin(time);
+            vec3 color = vec3(0.6, 0.4, 1.0) * trail;
+            gl_FragColor = vec4(color, trail);
+          }
+        `;
+        break;
+    }
+    
+    if (fragmentSource) {
+      // Update shader with error handling
+      try {
+        gl.shaderSource(fragmentShader, fragmentSource);
+        gl.compileShader(fragmentShader);
+        
+        if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+          console.error('Shader compile error:', gl.getShaderInfoLog(fragmentShader));
+          return;
+        }
+        
+        gl.linkProgram(program);
+        
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          console.error('Program link error:', gl.getProgramInfoLog(program));
+          return;
+        }
+        
+        gl.useProgram(program);
+      } catch (error) {
+        console.error('Error updating shader:', error);
+      }
+    }
+  }
+
+  // Update render loop with error handling
+  function render() {
+    if (!canvas || !element || !gl || !isAnimating) return;
+    
+    try {
+      time += 0.01;
+      updateCanvasSize();
+
+      gl.uniform2f(mouseUniform, mouseX, mouseY);
+      gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
+      gl.uniform1f(timeUniform, time);
+
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      requestAnimationFrame(render);
+    } catch (error) {
+      console.error('Error in render loop:', error);
+      isAnimating = false;
+    }
+  }
+
+  // Only add event listener if element exists
+  if (element) {
+    element.addEventListener('mousemove', (e) => {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = canvas.height - (e.clientY - rect.top);
+    });
+  }
+
+  // Initialize render loop and properties
+  try {
+    render();
+    updateProperties();
+  } catch (error) {
+    console.error('Error initializing mouse effects:', error);
+  }
+
+  // Cleanup function
+  function cleanup() {
+    isAnimating = false;
+    if (gl) {
+      gl.deleteProgram(program);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
+      gl.deleteBuffer(buffer);
+    }
+  }
+
+  return {
+    updateProperties,
+    cleanup
+  };
+}
+
+// properties.js
+export function initializeProperties() {
+  const propertiesPanel = document.querySelector('.properties-panel .panel-content');
+
+  function updateProperties(element) {
+    if (!element) {
+      // Reset properties panel when no element is selected
+      propertiesPanel.innerHTML = `
+        <div class="property">
+          <label>No element selected</label>
+        </div>
+      `;
+      return;
+    }
+
+    const layerId = element.dataset.layerId;
+    const elementType = element.classList.contains('text-element') ? 'text' :
+                       element.classList.contains('image-placeholder') ? 'image' :
+                       element.classList.contains('shape-container') ? 'shape' :
+                       element.classList.contains('component-container') ? 'component' : 
+                       'unknown';
+
+    // Clear previous properties
+    propertiesPanel.innerHTML = '';
+
+    // Common properties for all elements
+    propertiesPanel.innerHTML += `
+      <div class="property">
+        <label>Position</label>
+        <div class="input-group">
+          <input type="number" data-prop="pos-x" value="${parseInt(element.style.left) || 0}">
+          <input type="number" data-prop="pos-y" value="${parseInt(element.style.top) || 0}">
+        </div>
+      </div>
+    `;
+
+    // Element-specific properties
+    switch (elementType) {
+      case 'text':
+        const textContent = element.querySelector('.text-content');
+        const computedStyle = window.getComputedStyle(textContent);
+        
+        propertiesPanel.innerHTML += `
+          <div class="text-properties">
+            <div class="property">
+              <label>Text Content</label>
+              <input type="text" data-prop="text-content" value="${textContent.textContent}">
+            </div>
+            
+            <div class="property">
+              <label>Font Family</label>
+              <select data-prop="font-family">
+                <option value="Montserrat, sans-serif">Montserrat</option>
+                <option value="Manrope, sans-serif">Manrope</option>
+                <option value="Geist, sans-serif">Geist</option>
+                <option value="Roboto, sans-serif">Roboto</option>
+                <option value="Open Sans, sans-serif">Open Sans</option>
+                <option value="Lato, sans-serif">Lato</option>
+                <option value="Poppins, sans-serif">Poppins</option>
+              </select>
+            </div>
+
+            <div class="property">
+              <label>Font Size</label>
+              <input type="number" data-prop="font-size" value="${parseInt(computedStyle.fontSize)}">
+            </div>
+
+            <div class="property">
+              <label>Font Weight</label>
+              <div class="font-weight-options">
+                <button class="weight-option" data-weight="300">Light</button>
+                <button class="weight-option" data-weight="400">Regular</button>
+                <button class="weight-option" data-weight="500">Medium</button>
+                <button class="weight-option" data-weight="700">Bold</button>
+              </div>
+            </div>
+
+            <div class="property">
+              <label>Font Color</label>
+              <input type="color" data-prop="font-color" value="${rgbToHex(computedStyle.color)}">
+            </div>
+          </div>
+        `;
+        
+        setupTextPropertyListeners(textContent, layerId);
+        break;
+
+      case 'image':
+        propertiesPanel.innerHTML += `
+          <div class="property">
+            <label>Size</label>
+            <div class="input-group">
+              <input type="number" data-prop="width" value="${element.querySelector('img')?.offsetWidth || 200}">
+              <input type="number" data-prop="height" value="${element.querySelector('img')?.offsetHeight || 200}">
+            </div>
+          </div>
+          
+          <div class="image-upload">
+            <label>Image</label>
+            <input type="file" accept="image/*" style="display: none">
+            <button class="image-upload-btn">Click to upload image</button>
+            <div class="image-preview">
+              ${element.querySelector('img') ? 
+                `<img src="${element.querySelector('img').src}" alt="">` :
+                `<div class="empty-state">No image selected</div>`
+              }
+            </div>
+          </div>
+        `;
+        
+        setupImagePropertyListeners(element, layerId);
+        break;
+
+      case 'shape':
+        propertiesPanel.innerHTML += `
+          <div class="property">
+            <label>Size</label>
+            <div class="input-group">
+              <input type="number" data-prop="width" value="${parseInt(element.style.width) || 200}">
+              <input type="number" data-prop="height" value="${parseInt(element.style.height) || 200}">
+            </div>
+          </div>
+          
+          <div class="property">
+            <label>Rotation</label>
+            <input type="range" data-prop="rotation" min="0" max="360" value="0">
+          </div>
+        `;
+        break;
+
+      case 'component':
+        propertiesPanel.innerHTML += `
+          <div class="property">
+            <label>Size</label>
+            <div class="input-group">
+              <input type="number" data-prop="width" value="${parseInt(element.style.width) || 200}">
+              <input type="number" data-prop="height" value="${parseInt(element.style.height) || 200}">
+            </div>
+          </div>
+        `;
+        break;
+    }
+
+    // Add event listeners for common properties
+    setupCommonPropertyListeners(element, layerId);
+  }
+
+  function setupCommonPropertyListeners(element, layerId) {
+    const posXInput = propertiesPanel.querySelector('[data-prop="pos-x"]');
+    const posYInput = propertiesPanel.querySelector('[data-prop="pos-y"]');
+    
+    posXInput?.addEventListener('change', () => {
+      element.style.left = `${posXInput.value}px`;
+      window.layerManager?.updateLayerProperties(layerId, {
+        x: parseInt(posXInput.value)
+      });
+    });
+
+    posYInput?.addEventListener('change', () => {
+      element.style.top = `${posYInput.value}px`;
+      window.layerManager?.updateLayerProperties(layerId, {
+        y: parseInt(posYInput.value)
+      });
+    });
+  }
+
+  function setupTextPropertyListeners(textContent, layerId) {
+    const textInput = propertiesPanel.querySelector('[data-prop="text-content"]');
+    const fontSizeInput = propertiesPanel.querySelector('[data-prop="font-size"]');
+    const fontColorInput = propertiesPanel.querySelector('[data-prop="font-color"]');
+    const fontFamilySelect = propertiesPanel.querySelector('[data-prop="font-family"]');
+    const fontWeightOptions = propertiesPanel.querySelectorAll('.weight-option');
+
+    textInput?.addEventListener('input', () => {
+      textContent.textContent = textInput.value;
+      window.layerManager?.updateLayerContent(layerId, textInput.value);
+    });
+
+    fontSizeInput?.addEventListener('input', () => {
+      textContent.style.fontSize = `${fontSizeInput.value}px`;
+      window.layerManager?.updateLayerProperties(layerId, {
+        fontSize: parseInt(fontSizeInput.value)
+      });
+    });
+
+    fontColorInput?.addEventListener('input', () => {
+      textContent.style.color = fontColorInput.value;
+      window.layerManager?.updateLayerProperties(layerId, {
+        color: fontColorInput.value
+      });
+    });
+
+    fontFamilySelect?.addEventListener('change', () => {
+      textContent.style.fontFamily = fontFamilySelect.value;
+      window.layerManager?.updateLayerProperties(layerId, {
+        fontFamily: fontFamilySelect.value
+      });
+    });
+
+    fontWeightOptions?.forEach(option => {
+      option.addEventListener('click', () => {
+        fontWeightOptions.forEach(opt => opt.classList.remove('active'));
+        option.classList.add('active');
+        textContent.style.fontWeight = option.dataset.weight;
+        window.layerManager?.updateLayerProperties(layerId, {
+          fontWeight: option.dataset.weight
+        });
+      });
+    });
+  }
+
+  function setupImagePropertyListeners(element, layerId) {
+    const fileInput = propertiesPanel.querySelector('input[type="file"]');
+    const uploadBtn = propertiesPanel.querySelector('.image-upload-btn');
+    const preview = propertiesPanel.querySelector('.image-preview');
+    
+    uploadBtn?.addEventListener('click', () => fileInput.click());
+    
+    fileInput?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          // Update preview
+          preview.innerHTML = `<img src="${event.target.result}" alt="">`;
+          
+          // Update element
+          const img = new Image();
+          img.src = event.target.result;
+          img.className = 'uploaded-image';
+          
+          img.onload = () => {
+            const maxInitialWidth = 400;
+            const maxInitialHeight = 400;
+            
+            const aspectRatio = img.naturalWidth / img.naturalHeight;
+            let newWidth = img.naturalWidth;
+            let newHeight = img.naturalHeight;
+            
+            if (newWidth > maxInitialWidth || newHeight > maxInitialHeight) {
+              if (aspectRatio > 1) {
+                newWidth = maxInitialWidth;
+                newHeight = newWidth / aspectRatio;
+              } else {
+                newHeight = maxInitialHeight;
+                newWidth = newHeight * aspectRatio;
+              }
+            }
+            
+            element.innerHTML = `
+              <img class="uploaded-image" src="${img.src}" style="width: ${newWidth}px; height: ${newHeight}px">
+              <button class="fx-btn" title="Add FX">✦</button>
+            `;
+            element.classList.remove('empty');
+            element.classList.add('has-image');
+            
+            // Re-add selection handles
+            const handles = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+            handles.forEach(position => {
+              const handle = document.createElement('div');
+              handle.className = `selection-handle ${position}`;
+              handle.style.display = element.classList.contains('selected') ? 'block' : 'none';
+              element.appendChild(handle);
+            });
+            
+            // Update ExportManager
+            window.layerManager?.updateLayerContent(layerId, event.target.result);
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  function rgbToHex(rgb) {
+    // Extract RGB values
+    const [r, g, b] = rgb.match(/\d+/g).map(Number);
+    return '#' + [r, g, b].map(x => {
+      const hex = x.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    }).join('');
+  }
+
+  return {
+    updateProperties
+  };
+}
+
+// export-manager.js
+export class ExportManager {
+  constructor() {
+    this.layers = new Map();
+    this.nextLayerId = 0;
+    
+    // Add observer initialization 
+    this.initializeObserver();
+  }
+
+  initializeObserver() {
+    // Create MutationObserver to watch for changes
+    this.observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        // Handle both node and characterData mutations
+        if (mutation.type === 'characterData') {
+          // For text content changes
+          const element = mutation.target.parentElement?.closest('[data-layer-id]');
+          if (element) {
+            const layerId = element.dataset.layerId;
+            // Update text content
+            this.updateLayerContent(layerId, mutation.target.textContent);
+          }
+        } else {
+          // For other changes like attributes
+          const element = mutation.target.closest('[data-layer-id]');
+          if (element) {
+            const layerId = element.dataset.layerId;
+            
+            if (mutation.target.classList?.contains('text-content')) {
+              // Update text content
+              this.updateLayerContent(layerId, mutation.target.textContent);
+            }
+            
+            // Update position/dimensions
+            const rect = element.getBoundingClientRect();
+            this.updateLayerProperties(layerId, {
+              x: parseInt(element.style.left),
+              y: parseInt(element.style.top),
+              width: rect.width,
+              height: rect.height
+            });
+          }
+        }
+      });
+      
+      // Trigger export preview update
+      this.notifyChange();
+    });
+
+    // Observe canvas area for changes
+    const canvas = document.querySelector('.canvas');
+    if (canvas) {
+      this.observer.observe(canvas, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        characterDataOldValue: true,
+        attributes: true,
+        attributeFilter: ['style', 'class']
+      });
+    }
+  }
+
+  addLayer(type, properties = {}) {
+    const layerId = this.nextLayerId++;
+    
+    this.layers.set(layerId, {
+      type,
+      properties: { ...properties },
+      content: null,
+      effects: []
+    });
+
+    return layerId;
+  }
+
+  updateLayerContent(layerId, content) {
+    const layer = this.layers.get(layerId);
+    if (layer) {
+      layer.content = content;
+      this.notifyChange();
+    }
+  }
+
+  updateLayerProperties(layerId, properties) {
+    const layer = this.layers.get(layerId);
+    if (layer) {
+      layer.properties = { ...layer.properties, ...properties };
+      this.notifyChange();
+    }
+  }
+
+  notifyChange() {
+    // Dispatch custom event when layers change
+    window.dispatchEvent(new CustomEvent('layersupdate'));
+  }
+
+  generateEmbed() {
+    const css = this.generateLayerStyles();
+    const html = this.generateLayerMarkup();
+    
+    return {
+      html: `<div class="animation-container">\n${html}\n</div>`,
+      css: `.animation-container {\n  position: relative;\n  width: 100%;\n  height: 100vh;\n  background: #090909;\n  overflow: hidden;\n}\n\n${css}`,
+      combined: `<div class="animation-container" style="position:relative; width:100%; height:100vh; background:#090909; overflow:hidden;">\n${html}\n</div>`
+    };
+  }
+
+  generateStandaloneCode() {
+    let html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exported Animation</title>
+  <style>
+    .animation-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background: #090909;
+      overflow: hidden;
+    }
+    
+    ${this.generateLayerStyles()}
+  </style>
+</head>
+<body>
+  <div class="animation-container">
+    ${this.generateLayerMarkup()}
+  </div>
+
+  <script>
+    ${this.generateLayerScripts()}
+  </script>
+</body>
+</html>`;
+
+    return {
+      html,
+      preview: `
+        <div class="animation-container">
+          ${this.generateLayerMarkup()}
+        </div>
+      `
+    };
+  }
+
+  generateLayerStyles() {
+    let css = '';
+    
+    this.layers.forEach((layer, id) => {
+      const uniqueId = `layer-${id}`;
+      
+      switch (layer.type) {
+        case 'text':
+          css += `
+            #${uniqueId} {
+              position: absolute;
+              left: ${layer.properties.x || 0}px;
+              top: ${layer.properties.y || 0}px;
+              font-family: ${layer.properties.fontFamily || 'Arial, sans-serif'};
+              font-size: ${layer.properties.fontSize || 16}px;
+              color: ${layer.properties.color || '#000'};
+              transform-origin: center;
+              ${this.generateEffectStyles(layer.effects)}
+            }`;
+          break;
+          
+        case 'image':
+          css += `
+            #${uniqueId} {
+              position: absolute;
+              left: ${layer.properties.x || 0}px;
+              top: ${layer.properties.y || 0}px;
+              width: ${layer.properties.width || 200}px;
+              height: ${layer.properties.height || 200}px;
+              transform-origin: center;
+              ${this.generateEffectStyles(layer.effects)}
+            }
+            
+            #${uniqueId} img {
+              width: 100%;
+              height: 100%;
+              object-fit: contain;
+            }`;
+          break;
+      }
+    });
+    
+    return css;
+  }
+
+  generateLayerMarkup() {
+    let html = '';
+    
+    this.layers.forEach((layer, id) => {
+      const uniqueId = `layer-${id}`;
+      
+      switch (layer.type) {
+        case 'text':
+          html += `
+            <div id="${uniqueId}" class="animated-text">
+              ${layer.content || 'Text'}
+            </div>`;
+          break;
+          
+        case 'image':
+          html += `
+            <div id="${uniqueId}" class="animated-image">
+              <img src="${layer.content || ''}" alt="" />
+            </div>`;
+          break;
+      }
+    });
+    
+    return html;
+  }
+
+  generateLayerScripts() {
+    let js = `
+      document.addEventListener('DOMContentLoaded', () => {
+        ${Array.from(this.layers.entries()).map(([id, layer]) => {
+          return `
+            const layer${id} = document.getElementById('layer-${id}');
+            ${this.generateEffectScripts(layer.effects, id)}
+          `;
+        }).join('\n')}
+      });
+    `;
+    
+    return js;
+  }
+
+  generateEffectStyles(effects = []) {
+    return effects.map(effect => {
+      switch (effect.type) {
+        case 'fade':
+          return 'opacity: 0; transition: opacity 0.3s ease;';
+        case 'scale':
+          return 'transform: scale(0); transition: transform 0.3s ease;';
+        default:
+          return '';
+      }
+    }).join('\n');
+  }
+
+  generateEffectScripts(effects = [], layerId) {
+    return effects.map(effect => {
+      switch (effect.type) {
+        case 'fade':
+          return `layer${layerId}.style.opacity = 1;`;
+        case 'scale':
+          return `layer${layerId}.style.transform = 'scale(1)';`;
+        default:
+          return '';
+      }
+    }).join('\n');
+  }
+}
+
+// component-handler.js
+export function initializeComponentHandler(layerId, type) {
+  const canvas = document.querySelector('.canvas');
+  
+  // Create component container
+  const componentContainer = document.createElement('div');
+  componentContainer.className = `component-container ${type}-component`;
+  componentContainer.dataset.layerId = layerId;
+  
+  // Add component-specific content
+  switch (type) {
+    case 'nav':
+      componentContainer.innerHTML = `
+        <nav class="nav-content">
+          <div class="nav-logo">Logo</div>
+          <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+          <button class="nav-menu">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+        </nav>
+      `;
+      break;
+
+    case 'card':
+      componentContainer.innerHTML = `
+        <div class="card-content">
+          <div class="card-image"></div>
+          <div class="card-body">
+            <h3>Card Title</h3>
+            <p>This is a sample card description. Click to edit the content.</p>
+            <button class="card-button">Learn More</button>
+          </div>
+        </div>
+      `;
+      break;
+
+    case 'button':
+      componentContainer.innerHTML = `
+        <button class="button-content">
+          <span>Click Me</span>
+          <svg viewBox="0 0 24 24">
+            <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none"/>
+          </svg>
+        </button>
+      `;
+      break;
+  }
+
+  // Position in center of viewport
+  const centerX = (window.innerWidth - 200) / 2;
+  const centerY = (window.innerHeight - 200) / 2;
+  
+  componentContainer.style.left = `${centerX}px`;
+  componentContainer.style.top = `${centerY}px`;
+
+  // Add selection handles
+  const handles = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+  handles.forEach(position => {
+    const handle = document.createElement('div');
+    handle.className = `selection-handle ${position}`;
+    handle.style.display = 'none';
+    componentContainer.appendChild(handle);
+  });
+
+  canvas.appendChild(componentContainer);
+
+  // Initialize dragging functionality
+  let isDragging = false;
+  let startX, startY;
+  let elementX, elementY;
+
+  function handleMouseDown(e) {
+    if (e.target.closest('.selection-handle')) {
+      return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    isDragging = true;
+    
+    // Store initial mouse position
+    startX = e.clientX;
+    startY = e.clientY;
+    
+    // Store initial element position
+    elementX = parseInt(componentContainer.style.left) || 0;
+    elementY = parseInt(componentContainer.style.top) || 0;
+    
+    // Select component
+    selectComponent(componentContainer);
+    componentContainer.classList.add('dragging');
+  }
+
+  function handleMouseMove(e) {
+    if (!isDragging) return;
+    
+    e.preventDefault();
+    
+    // Calculate distance moved
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+    
+    // Update element position
+    componentContainer.style.left = `${elementX + deltaX}px`;
+    componentContainer.style.top = `${elementY + deltaY}px`;
+    
+    // Update properties panel
+    import('./properties.js').then(module => {
+      module.initializeProperties().updateProperties(componentContainer);
+    });
+  }
+
+  function handleMouseUp() {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    componentContainer.classList.remove('dragging');
+  }
+
+  function selectComponent(element) {
+    // Deselect all other elements
+    document.querySelectorAll('.component-container, .image-placeholder, .text-element').forEach(el => {
+      el.classList.remove('selected');
+      el.querySelectorAll('.selection-handle').forEach(handle => {
+        handle.style.display = 'none';
+      });
+    });
+    
+    // Select current element
+    element.classList.add('selected');
+    element.querySelectorAll('.selection-handle').forEach(handle => {
+      handle.style.display = 'block';
+    });
+    
+    // Select corresponding layer
+    document.querySelectorAll('.layer-list li').forEach(layer => {
+      layer.classList.remove('active');
+    });
+    
+    const correspondingLayer = document.querySelector(`.layer-list li[data-layer-id="${element.dataset.layerId}"]`);
+    if (correspondingLayer) {
+      correspondingLayer.classList.add('active');
+    }
+  }
+
+  componentContainer.addEventListener('mousedown', handleMouseDown);
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
+
+  // Make content editable
+  const editableElements = componentContainer.querySelectorAll('h3, p, span, a');
+  editableElements.forEach(element => {
+    element.contentEditable = true;
+  });
+
+  return {
+    componentContainer
+  };
+}
+
+// canvas.js
+export function initializeCanvas() {
+  const canvasArea = document.querySelector('.canvas-area');
+  const canvas = document.querySelector('.canvas');
+  
+  // Update canvas size on window resize
+  function updateCanvasSize() {
+    const width = window.innerWidth;
+    const height = window.innerHeight - 56; // Subtract toolbar height
+    canvasArea.style.width = `${width}px`;
+    canvasArea.style.height = `${height}px`;
+  }
+  
+  window.addEventListener('resize', updateCanvasSize);
+  updateCanvasSize(); // Initial size
+
+  // Canvas dragging
+  let isDraggingCanvas = false;
+  let startX, startY, scrollLeft, scrollTop;
+  
+  canvasArea.addEventListener('mousedown', (e) => {
+    if (e.target === canvas || e.target === canvasArea) {
+      isDraggingCanvas = true;
+      canvasArea.style.cursor = 'grabbing';
+      
+      startX = e.pageX - canvasArea.offsetLeft;
+      startY = e.pageY - canvasArea.offsetTop;
+      scrollLeft = canvasArea.scrollLeft;
+      scrollTop = canvasArea.scrollTop;
+      
+      // Deselect all elements when clicking canvas
+      deselectAll();
+    }
+  });
+  
+  canvasArea.addEventListener('mousemove', (e) => {
+    if (!isDraggingCanvas) return;
+    
+    e.preventDefault();
+    const x = e.pageX - canvasArea.offsetLeft;
+    const y = e.pageY - canvasArea.offsetTop;
+    
+    const moveX = x - startX;
+    const moveY = y - startY;
+    
+    canvasArea.scrollLeft = scrollLeft - moveX;
+    canvasArea.scrollTop = scrollTop - moveY;
+  });
+  
+  canvasArea.addEventListener('mouseup', () => {
+    isDraggingCanvas = false;
+    canvasArea.style.cursor = 'grab';
+  });
+  
+  canvasArea.addEventListener('mouseleave', () => {
+    isDraggingCanvas = false;
+    canvasArea.style.cursor = 'grab';
+  });
+  
+  // Center canvas initially
+  window.addEventListener('load', () => {
+    canvasArea.scrollLeft = (canvasArea.scrollWidth - canvasArea.clientWidth) / 2;
+    canvasArea.scrollTop = (canvasArea.scrollHeight - canvasArea.clientHeight) / 2;
+  });
+  
+  // Prevent drag start on canvas
+  canvas.addEventListener('dragstart', (e) => {
+    e.preventDefault();
+  });
+
+  function deselectAll() {
+    // Deselect all placeholders
+    document.querySelectorAll('.image-placeholder').forEach(p => {
+      p.classList.remove('selected');
+      p.querySelectorAll('.selection-handle').forEach(handle => {
+        handle.style.display = 'none';
+      });
+    });
+    
+    // Deselect all layers
+    document.querySelectorAll('.layer-list li').forEach(layer => {
+      layer.classList.remove('active');
+    });
+    
+    // Hide FX panels
+    document.querySelectorAll('.fx-panel-canvas').forEach(panel => {
+      panel.remove();
+    });
+    
+    // Reset properties panel
+    import('./properties.js').then(module => {
+      module.initializeProperties().updateProperties(null);
+    });
+  }
+  
+  // Add click handler to canvas to deselect everything
+  canvas.addEventListener('click', (e) => {
+    if (e.target === canvas) {
+      deselectAll();
+    }
+  });
+  
+  return {
+    deselectAll
+  };
+}
+
+// rotate.js
+export function applyRotateEffect(element) {
+  if (!element) return null;
+  
+  // Get or create content wrapper
+  let contentWrapper = element.querySelector('.image-content-wrapper');
+  if (!contentWrapper) {
+    // Move all content except .fx-btn and .selection-handle into wrapper
+    contentWrapper = document.createElement('div');
+    contentWrapper.className = 'image-content-wrapper';
+    
+    // Move existing content into wrapper
+    const content = Array.from(element.children).filter(child => {
+      return !child.classList.contains('fx-btn') && 
+             !child.classList.contains('selection-handle');
+    });
+    
+    content.forEach(node => contentWrapper.appendChild(node));
+    element.insertBefore(contentWrapper, element.firstChild);
+  }
+  
+  // Apply animation to wrapper only
+  contentWrapper.style.transformStyle = 'preserve-3d';
+  contentWrapper.style.perspective = '1000px';
+  contentWrapper.style.animation = 'rotate-y 2s linear infinite';
+  contentWrapper.style.transformOrigin = 'center center';
+  
+  // Create and inject keyframe animation if it doesn't exist
+  if (!document.querySelector('#rotate-keyframes')) {
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'rotate-keyframes';
+    styleSheet.textContent = `
+      @keyframes rotate-y {
+        from {
+          transform: rotateY(0deg);
+        }
+        to {
+          transform: rotateY(360deg);
+        }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+  }
+
+  // Return cleanup function
+  return () => {
+    if (contentWrapper) {
+      contentWrapper.style.animation = '';
+      contentWrapper.style.transformStyle = '';
+      contentWrapper.style.perspective = '';
+      contentWrapper.style.transformOrigin = '';
+      
+      // Move content back to main element if needed
+      while (contentWrapper.firstChild) {
+        element.insertBefore(contentWrapper.firstChild, contentWrapper);
+      }
+      contentWrapper.remove();
+    }
+  };
+}
+
+// effects-manager.js
+import { applyRotateEffect } from './rotate.js';
+
+export class EffectsManager {
+  constructor() {
+    this.activeEffects = new Map(); // tracks active effects by element ID
+    
+    // Register available effects
+    this.effects = {
+      rotate: applyRotateEffect
+      // Add more effects here as they are created
+    };
+  }
+
+  applyEffect(elementId, effectName) {
+    const element = document.querySelector(`[data-layer-id="${elementId}"]`);
+    if (!element) return;
+
+    // Remove any existing effect first
+    this.removeEffect(elementId);
+
+    // Apply new effect and store cleanup function
+    const cleanup = this.effects[effectName]?.(element);
+    if (cleanup) {
+      this.activeEffects.set(elementId, {
+        name: effectName,
+        cleanup
+      });
+    }
+  }
+
+  removeEffect(elementId) {
+    const effect = this.activeEffects.get(elementId);
+    if (effect?.cleanup) {
+      effect.cleanup();
+      this.activeEffects.delete(elementId);
+    }
+  }
+
+  getActiveEffect(elementId) {
+    return this.activeEffects.get(elementId)?.name;
+  }
+}
+
+</script>
+</body>
+</html>
